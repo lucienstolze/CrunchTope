@@ -64,7 +64,7 @@ INTEGER(I4B)                                                          :: jy
 INTEGER(I4B)                                                          :: jz
 INTEGER(I4B)                                                          :: npz
 
-REAL(DP)                                                       :: dt,pumpterm
+REAL(DP)                                                       :: dt, pumpterm
 REAL(DP), INTENT(IN)                                           :: dtyr
 
 !  ****** PARAMETERS  ****************************
@@ -129,21 +129,23 @@ DO jz = 1,nz
                 END IF
 
                 ! flux boundary condition
-                pumpterm = 0.0d0
+                pumpterm = 0.0d0 !pump located at jy+1 (positiv)
                 IF (wells .OR. pumptimeseries) THEN
                   DO npz = 1,npump(jx,jy+1,jz)
                     pumpterm = pumpterm + qg(npz,jx,jy+1,jz)/(secyr*dxx(jx)*dzz(jx,jy+1,jz))
                   END DO
 
-                  IF (qy(jx,jy,jz) >= 0.0 .AND. pumpterm > 0.0) THEN !! if infiltration and flow have same orientation
-                      IF (npump(jx,jy+1,jz) > 0) THEN
-                          qy(jx,jy,jz) = pumpterm
-                      END IF
-                    ELSEIF (pumpterm <= 0.0) THEN !! evapotranspiration
-                      qy(jx,jy,jz) = pumpterm !! ?? check if correct, maybe change in water content is enough
-                  END IF
-
+                  IF (pumpterm /= 0) THEN
+                    qy(jx,jy,jz) = pumpterm
+                ELSE
+                    qy(jx,jy,jz) = 0.0d0
                 END IF
+
+                ENDIF
+                
+                  IF (qy(jx,jy,jz) < 0.0 .AND. head(jx,jy+1,jz) == 0.0d0) THEN
+                    qy(jx,jy,jz) = 0
+                  END IF
 
                 ! check if there is enough room available in case of infiltration
                 IF (qy(jx,jy,jz) > 0.0 .AND. room(jx,jy+1,jz) < qy(jx,jy,jz) * dt * dxx(jx)* dzz(jx,jy+1,jz)) THEN
@@ -178,18 +180,18 @@ DO jz = 1,nz
             END IF
         END IF
         ! Switch to flux BC if pressure BC is not defined
-        IF (activecellPressure(jx,0,jz) == 1) THEN
-            pumpterm = 0.0d0
-            IF (wells .OR. pumptimeseries) THEN
-                DO npz = 1,npump(jx,1,jz)
-                    pumpterm = pumpterm + qg(npz,jx,1,jz)/(secyr*dxx(jx)*dzz(jx,0,jz))
-                END DO
-                IF (npump(jx,1,jz) > 0) THEN
-                    qy(jx,0,jz) = pumpterm
-                ELSE
-                    qy(jx,0,jz) = 0.0d0
-                END IF
-            ELSE
+        IF (activecellPressure(jx,0,jz) == 0 .AND. activecellPressure(jx,1,jz) == 1) THEN
+          pumpterm = 0.0d0
+          IF (wells .OR. pumptimeseries) THEN
+              DO npz = 1,npump(jx,1,jz)
+                  pumpterm = pumpterm + qg(npz,jx,1,jz)/(secyr*dxx(jx)*dzz(jx,0,jz))
+              END DO
+              IF (pumpterm /= 0) THEN
+                  qy(jx,0,jz) = pumpterm
+              ELSE
+                  qy(jx,0,jz) = 0.0d0
+              END IF
+          ELSE
               ! If neither pump nor pressure is specified, qy = 0
               qy(jx,0,jz) = 0.0d0
             END IF
@@ -197,7 +199,12 @@ DO jz = 1,nz
     ELSE
         WRITE(*,*) ' WARNING : Richards solver only works for 2D x-y now!'
     END IF
-    ! check if there is enough room available
+    
+    !Cannot extract anymore if cell is dry:
+    IF (qy(jx,0,jz) < 0.0 .AND. head(jx,1,jz) == 0.0d0) THEN
+      qy(jx,0,jz) = 0
+    END IF
+  ! check if there is enough room available:
     IF (qy(jx,0,jz) > 0.0 .AND. room(jx,1,jz) < qy(jx,0,jz) * dt * dxx(jx)* dzz(jx,1,jz)) THEN
         qy(jx,0,jz) = room(jx,1,jz) / dt * dxx(jx)* dzz(jx,1,jz)
     END IF
@@ -207,21 +214,21 @@ DO jz = 1,nz
 !!  ***  Calculate qy(j,NY,jz)  ******************
 
     !forbid back flow
-    IF (head(jx,ny+1,jz)>=head(jx,ny,jz) .AND. back_flow_closed) then
-      qy(jx,ny,jz)=0
-      Kfacy(jx,ny,jz)=0
-    END IF
+    !IF (head(jx,ny+1,jz)>=head(jx,ny,jz) .AND. back_flow_closed) then
+    !  qy(jx,ny,jz)=0
+    !  Kfacy(jx,ny,jz)=0
+    !END IF
 
     ! jy = ny
+
     qy(jx,ny,jz) = -2.0d0 * Kfacy(jx,ny,jz) * (head(jx,ny+1,jz) - head(jx,ny,jz)) / (dyy(ny))
     ! gravity term
+
     IF (y_is_vertical) THEN
       qy(jx,ny,jz) = qy(jx,ny,jz) + Kfacy(jx,ny,jz)
       if (qy(jx,ny,jz) > 0.0) THEN
         continue
       END IF
-
-
 
       ! pump source term
       IF (activecellPressure(jx,ny+1,jz) == 1) THEN
@@ -251,9 +258,9 @@ DO jz = 1,nz
       WRITE(*,*) ' WARNING : Richards solver only works for 2D x-y now!'
     END IF
     ! check if there is enough room available
-    IF (qy(jx,ny,jz) < 0.0 .AND. room(jx,ny,jz) < -qy(jx,ny,jz) * dt * dxx(jx)* dzz(jx,ny,jz)) THEN
-      qy(jx,ny,jz) = -room(jx,ny,jz) / dt * dxx(jx)* dzz(jx,ny,jz)
-    END IF
+    !IF (qy(jx,ny,jz) < 0.0 .AND. room(jx,ny,jz) < -qy(jx,ny,jz) * dt * dxx(jx)* dzz(jx,ny,jz)) THEN
+    !  qy(jx,ny,jz) = -room(jx,ny,jz) / dt * dxx(jx)* dzz(jx,ny,jz)
+    !END IF
 
 !!  ****   End of qy(jx,NY,jz)   ******************
 

@@ -627,12 +627,20 @@ DO jy = 1,ny
         dharm = GeometricMean(dums,dumpy)
       END IF
       
+      if (activecellPressure(jx,jy,jz) == 1 .AND. activecellPressure(jx,jy-1,jz) == 0 .AND. Richards) THEN
+      AreaS = dxx(jx)*dzz(jx,jy,jz)
+      dsps = avgro*dspy(jx,jy-1,jz) + dharm
+      ds = 0*AreaS*dsps/dys
+      fs = AreaS*avgro*(qy(jx,jy-1,jz) + FluidBuryY(jy-1))
+      as = DMAX1(fs,0.0D0) + ds
+      else
       AreaS = dxx(jx)*dzz(jx,jy,jz)
       dsps = avgro*dspy(jx,jy-1,jz) + dharm
       ds = AreaS*dsps/dys
       fs = AreaS*avgro*(qy(jx,jy-1,jz) + FluidBuryY(jy-1))
       as = DMAX1(fs,0.0D0) + ds
-      
+      endif
+
       apy = ds + dn + DMAX1(-fs,0.0D0) + DMAX1(fn,0.0D0)
       
     END IF

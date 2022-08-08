@@ -791,7 +791,11 @@ DO i = 1,ncomp
         yvecgas = 0.0
       END IF
     ELSE
+!      if (activecellPressure(jx,jy,jz) == 1) THEN
       yvectors = d(jx,jy,jz)*scn(i)
+!      ELSEIF (activecellPressure(jx,jy,jz) == 0) THEN
+!        yvectors = 0*d(jx,jy,jz)*scn(i)
+!      ENDIF
       IF (isaturate == 1) THEN
         yvecgas =  dg(jx,jy,jz)*sgn(i) + fg(jx,jy,jz)*sgs(i)
  !!       yvecgas =  dg(jx,jy,jz)*sgn(i)
@@ -820,8 +824,15 @@ DO i = 1,ncomp
     
   ELSE
     
+!    if (activecellPressure(jx,jy,jz) == 1 .AND. activecellPressure(jx,jy-1,jz) == 1 .AND. activecellPressure(jx,jy+1,jz) == 1) THEN
     yvectors = d(jx,jy,jz)*scn(i) + f(jx,jy,jz)*scs(i)
-    
+!    elseif (activecellPressure(jx,jy,jz) == 1 .AND. activecellPressure(jx,jy-1,jz) == 0 .AND. activecellPressure(jx,jy+1,jz) == 1) THEN
+!    yvectors = d(jx,jy,jz)*scn(i)
+!    elseif (activecellPressure(jx,jy,jz) == 1 .AND. activecellPressure(jx,jy-1,jz) == 1 .AND. activecellPressure(jx,jy+1,jz) == 0) THEN
+!      yvectors = f(jx,jy,jz)*scs(i)
+!    elseif (activecellPressure(jx,jy,jz) == 0) THEN
+!        yvectors = 0*d(jx,jy,jz)*scn(i)
+!    ENDIF
 !!!    IF (jx==42 .and. jy==43 .and. i==1) THEN
 !!!      write(*,*)
 !!!      write(*,*) ' d(north) = ',d(jx,jy,jz),scn(i)

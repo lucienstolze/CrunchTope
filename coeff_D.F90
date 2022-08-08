@@ -1,17 +1,17 @@
 !!! *** Copyright Notice ***
-!!! “CrunchFlow”, Copyright (c) 2016, The Regents of the University of California, through Lawrence Berkeley National Laboratory 
-!!! (subject to receipt of any required approvals from the U.S. Dept. of Energy).  All rights reserved.
-!!! 
+!!! ï¿½CrunchFlowï¿½, Copyright (c) 2016, The Regents of the University of California, through Lawrence Berkeley National Laboratory 
+!!! (subject to receipt of any required approvals from the U.S. Dept. of Energy).ï¿½ All rights reserved.
+!!!ï¿½
 !!! If you have questions about your rights to use or distribute this software, please contact 
-!!! Berkeley Lab's Innovation & Partnerships Office at  IPO@lbl.gov.
-!!! 
-!!! NOTICE.  This Software was developed under funding from the U.S. Department of Energy and the U.S. Government 
+!!! Berkeley Lab's Innovation & Partnerships Office atï¿½ï¿½IPO@lbl.gov.
+!!!ï¿½
+!!! NOTICE.ï¿½ This Software was developed under funding from the U.S. Department of Energy and the U.S. Government 
 !!! consequently retains certain rights. As such, the U.S. Government has been granted for itself and others acting 
 !!! on its behalf a paid-up, nonexclusive, irrevocable, worldwide license in the Software to reproduce, distribute copies to the public, 
 !!! prepare derivative works, and perform publicly and display publicly, and to permit other to do so.
 !!!
 !!! *** License Agreement ***
-!!! “CrunchFlow”, Copyright (c) 2016, The Regents of the University of California, through Lawrence Berkeley National Laboratory)
+!!! ï¿½CrunchFlowï¿½, Copyright (c) 2016, The Regents of the University of California, through Lawrence Berkeley National Laboratory)
 !!! subject to receipt of any required approvals from the U.S. Dept. of Energy).  All rights reserved."
 !!! 
 !!! Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -50,6 +50,7 @@ USE transport
 USE temperature
 USE params
 USE CrunchFunctions
+USE flow
 
 IMPLICIT NONE
 
@@ -692,7 +693,20 @@ DO jy = 1,ny
       d_d(jx,jy,jz) = -an_d
       f_d(jx,jy,jz) = -as_d
       e_d(jx,jy,jz) = apy_d
+
+     ! IF (activecellPressure(jx,jy,jz) == 0) THEN
+     !   a(jx,jy,jz) = zero
+     !  b(jx,jy,jz) = zero
+     !  c(jx,jy,jz) = zero
+     !   d(jx,jy,jz) = zero
+     !   e(jx,jy,jz) = zero
+     !   f(jx,jy,jz) = zero
+     ! ENDIF
       
+     ! IF (activecellPressure(jx,jy-1,jz) == 0) THEN
+     !   f(jx,jy,jz) = zero
+     ! ENDIF
+
     END IF
     dxy(jx,jy,jz) = dxx(jx)*dyy(jy)*dzz(jx,jy,jz)
     
