@@ -106,23 +106,23 @@ DO jz = 1,nz
   !ENDIF 
 
 ! add source term if not along boundary
-            IF (jx > 1 .AND. jx < nx) THEN
+!             IF (jx > 1 .AND. jx < nx) THEN
 
-!!!                IF (jy > 1 .AND. jy < ny .AND. activecellPressure(jx,jy-1,jz) == 1 .AND. qg(1,jx,jy,jz) /= 0.0) THEN
-                IF (jy > 1 .AND. jy < ny .AND. activecellPressure(jx,jy-1,jz) == 1) THEN
+! !!!                IF (jy > 1 .AND. jy < ny .AND. activecellPressure(jx,jy-1,jz) == 1 .AND. qg(1,jx,jy,jz) /= 0.0) THEN
+!                 IF (jy > 1 .AND. jy < ny .AND. activecellPressure(jx,jy-1,jz) == 1) THEN
 
-                  pumpterm = 0.0d0
-                  IF (wells .OR. pumptimeseries) THEN
+!                   pumpterm = 0.0d0
+!                   IF (wells .OR. pumptimeseries) THEN
 
-                    DO npz = 1,npump(jx,jy,jz)
-                      pumpterm = pumpterm + dt*qg(npz,jx,jy,jz)/(secyr*dxx(jx)*dyy(jy)*dzz(jx,jy,jz))
-                    END DO
-                  END IF
-                  wc(jx,jy,jz) = wc(jx,jy,jz) + pumpterm
+!                     DO npz = 1,npump(jx,jy,jz)
+!                       pumpterm = pumpterm + dt*qg(npz,jx,jy,jz)/(secyr*dxx(jx)*dyy(jy)*dzz(jx,jy,jz))
+!                     END DO
+!                   END IF
+!                   wc(jx,jy,jz) = wc(jx,jy,jz) + pumpterm
 
-                END IF
+!                 END IF
 
-            END IF
+!             END IF
 
             ! IF (activecellPressure(jx,jy-1,jz) == 0) THEN
             !     WRITE(*,*) ' jx, wc, Ktop, qtop, Kbot, qbot = ',jx,wc(jx,jy,jz),Kfacy(jx,jy-1,jz),qy(jx,jy-1,jz),Kfacy(jx,jy,jz),qy(jx,jy,jz)

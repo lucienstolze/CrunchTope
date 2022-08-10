@@ -197,10 +197,11 @@ DO jz = 1,nz
                     IF (activecellPressure(jx,jy+1,jz) == 1) THEN
                         ! saturated if pressure is prescribed
                         IF (headOld(jx,jy,jz) > 0.0) THEN
-                            Kfacy(jx,jy,jz) = permy(jx,jy,jz) * (ro(jx,jy,jz)*grav/visc)
+                            Kfacy(jx,jy,jz) = permy(jx,jy,jz) * (ro(jx,jy,jz)*grav/visc) !! TO BE CHECKED LUCIEN
                         ELSE
                             Kfacy(jx,jy,jz) = permy(jx,jy+1,jz)*Kr(jx,jy+1,jz) * (ro(jx,jy+1,jz)*grav/visc)
                         END IF
+                        !Kfacy(jx,jy,jz) = 0.0d0
                     ELSE
                         Kfacy(jx,jy,jz) = 0.0d0
                     END IF

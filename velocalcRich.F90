@@ -64,7 +64,7 @@ INTEGER(I4B)                                                          :: jy
 INTEGER(I4B)                                                          :: jz
 INTEGER(I4B)                                                          :: npz
 
-REAL(DP)                                                       :: dt, pumpterm
+REAL(DP)                                                       :: dt, pumpterm, dummy1, dummy2, dummy3, conv_flow, dummy
 REAL(DP), INTENT(IN)                                           :: dtyr
 
 !  ****** PARAMETERS  ****************************
@@ -107,19 +107,55 @@ DO jz = 1,nz
 
       IF (jy /= ny) THEN
         Coordinate = 'Y'
-        if (jy == ny-1 .and. jx == nx-1) then
-          continue
-        end if
+        !if (jy == ny-1 .and. jx == nx-1) then
+        !  continue
+        !end if
         qy(jx,jy,jz) = -2.0d0 * Kfacy(jx,jy,jz) * (head(jx,jy+1,jz) - head(jx,jy,jz)) / (dyy(jy)+dyy(jy+1))
+       
+        !DO jz = 1,nz
+        !  DO jy = 1,ny
+        !    DO jx = 1,nx
+        ! IF (jx==nx .AND. head(jx,jy+1,jz) >0 .AND. activecellPressure(jx,jy,jz) == 0 .AND. activecellPressure(jx,jy+1,jz) == 1) THEN
+        !   WRITE(*,*) qy(jx,jy,jz) !*secyr
+        !   WRITE(*,*) jy
+        ! ENDIF
+        !END DO
+        !END DO
+        !END DO
+
         IF (y_is_vertical) THEN
             qz(jx,jy,jz) = 0.0d0
             qy(jx,jy,jz) = qy(jx,jy,jz) + Kfacy(jx,jy,jz)
 
-
 !! Land surface, "fixed" cell at JY, active cell at JY+1  -- velocity = 0, or set to "pump" term
 
             IF (activecellPressure(jx,jy,jz) == 0 .AND. activecellPressure(jx,jy+1,jz) == 1) THEN
-                qy(jx,jy,jz) = 2.0 * (qy(jx,jy,jz) - Kfacy(jx,jy,jz)) + Kfacy(jx,jy,jz)
+
+              qy(jx,jy,jz) = 2.0 * (qy(jx,jy,jz) - Kfacy(jx,jy,jz)) + Kfacy(jx,jy,jz)
+
+              !qy(jx,jy,jz) = -2.0d0 * Kfacy(jx,jy,jz) * (head(jx,jy+1,jz) - head(jx,jy,jz)) / (dyy(jy)) + Kfacy(jx,jy,jz)
+              !qy(jx,jy,jz) = -2.0d0 * Kfacy(jx,jy+1,jz) * (head(jx,jy+1,jz)) / (dyy(jy))
+
+              
+              ! IF (jx==nx .AND. head(jx,jy+1,jz) >0) THEN
+              !   WRITE(*,*) qy(jx,jy,jz)*secyr
+              !   WRITE(*,*) jy
+              ! ENDIF
+              ! 1 possible option:
+
+              ! dummy1 = -2.0d0 * Kfacx(jx-1,jy+1,jz) * (head(jx,jy+1,jz) - head(jx-1,jy+1,jz)) / (dxx(jx-1)+dxx(jx)) ! flow from left
+              ! dummy2 = -2.0d0 * Kfacx(jx,jy+1,jz) * (head(jx+1,jy+1,jz) - head(jx,jy+1,jz)) / (dxx(jx+1)+dxx(jx)) ! flow from right
+              ! dummy3 = -2.0d0 * Kfacy(jx,jy+1,jz) * (head(jx,jy+2,jz) - head(jx,jy+1,jz)) / (dyy(jy+1)+dyy(jy+2)) ! flow from below
+
+              ! conv_flow = dummy1 - dummy2 - dummy3 ! convergent flow
+
+              ! IF (conv_flow > 0.0 .AND. room(jx,jy+1,jz) < conv_flow * dt * dxx(jx)* dzz(jx,jy+1,jz)) THEN
+              !   qy(jx,jy,jz) = (room(jx,jy+1,jz) / (dt * dxx(jx)* dzz(jx,jy+1,jz))) - conv_flow
+              !   wc(jx,jy+1,jz)=fully sature
+              !  ! head(jx,jy+1,jz) = 1
+              ! END IF
+
+              !qy(jx,jy,jz) = -head(jx,jy+1,jz)
 
                 IF (head(jx,jy,jz) == 0.0d0) THEN
                     ! no infiltration on dry surface, but exfiltration is ok
@@ -135,21 +171,25 @@ DO jz = 1,nz
                     pumpterm = pumpterm + qg(npz,jx,jy+1,jz)/(secyr*dxx(jx)*dzz(jx,jy+1,jz))
                   END DO
 
-                  IF (pumpterm /= 0) THEN
+                IF (pumpterm > 0.0d0 .AND. room(jx,jy+1,jz) == 0.0d0) then
+                pumpterm = 0.0d0
+                ELSEIF (pumpterm < 0.0d0 .AND. wc(jx,jy+1,jz) == wcr(jx,jy+1,jz)) THEN
+                pumpterm = 0.0d0
+                ENDIF
+
+                IF (pumpterm /= 0.0d0) THEN
                     qy(jx,jy,jz) = pumpterm
-                ELSE
-                    qy(jx,jy,jz) = 0.0d0
                 END IF
 
                 ENDIF
                 
-                  IF (qy(jx,jy,jz) < 0.0 .AND. head(jx,jy+1,jz) == 0.0d0) THEN
-                    qy(jx,jy,jz) = 0
-                  END IF
+                !IF (qy(jx,jy,jz) < 0.0 .AND. wc(jx,jy+1,jz) == wcr(jx,jy+1,jz)) THEN
+                !  qy(jx,jy,jz) = 0
+                !END IF
 
                 ! check if there is enough room available in case of infiltration
                 IF (qy(jx,jy,jz) > 0.0 .AND. room(jx,jy+1,jz) < qy(jx,jy,jz) * dt * dxx(jx)* dzz(jx,jy+1,jz)) THEN
-                    qy(jx,jy,jz) = room(jx,jy+1,jz) / dt * dxx(jx)* dzz(jx,jy+1,jz)
+                   qy(jx,jy,jz) = room(jx,jy+1,jz) / (dt * dxx(jx)* dzz(jx,jy+1,jz))
                 END IF
 
             END IF
@@ -186,22 +226,27 @@ DO jz = 1,nz
               DO npz = 1,npump(jx,1,jz)
                   pumpterm = pumpterm + qg(npz,jx,1,jz)/(secyr*dxx(jx)*dzz(jx,0,jz))
               END DO
+              IF (pumpterm > 0.0d0 .AND. room(jx,1,jz) == 0.0d0) then
+                pumpterm = 0.0d0
+              ELSEIF (pumpterm < 0.0d0 .AND. wc(jx,1,jz) == wcr(jx,1,jz)) THEN
+                pumpterm = 0.0d0
+              ENDIF
               IF (pumpterm /= 0) THEN
                   qy(jx,0,jz) = pumpterm
-              ELSE
-                  qy(jx,0,jz) = 0.0d0
+              !ELSE
+              !    qy(jx,0,jz) = 0.0d0
               END IF
           ELSE
               ! If neither pump nor pressure is specified, qy = 0
               qy(jx,0,jz) = 0.0d0
-            END IF
+          END IF
         END IF
     ELSE
         WRITE(*,*) ' WARNING : Richards solver only works for 2D x-y now!'
     END IF
     
     !Cannot extract anymore if cell is dry:
-    IF (qy(jx,0,jz) < 0.0 .AND. head(jx,1,jz) == 0.0d0) THEN
+    IF (qy(jx,0,jz) < 0.0 .AND. wc(jx,1,jz) == wcr(jx,1,jz)) THEN
       qy(jx,0,jz) = 0
     END IF
   ! check if there is enough room available:

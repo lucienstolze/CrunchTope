@@ -197,12 +197,10 @@ END DO
 
 
 
-
 ! IF (redistribute_wc) THEN
 !     ! WRITE(*,*) '  Redistribution via 4 mechanisms: ',dist_path1,dist_path2,dist_path3,dist_path4, ' loss = ',loss
 !     WRITE(*,*) '  Total volume loss during redistribution (m^3) = ',loss, loss1, loss2, loss3
 ! END IF
-
 
 
 RETURN
