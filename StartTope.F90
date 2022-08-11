@@ -629,6 +629,9 @@ CHARACTER (LEN=mls)                          :: PumplocationsFileFormat
 INTEGER(I4B)                                                  :: lfile2
 CHARACTER (LEN=mls)                          :: watertablefile
 CHARACTER (LEN=mls)                          :: WatertableFileFormat
+CHARACTER (LEN=mls)                          :: evapofile
+REAL(DP)                                     :: evapovalue
+CHARACTER (LEN=mls)                          :: EvapoFileFormat
 
 REAL(DP), DIMENSION(:,:,:), ALLOCATABLE      :: check3
 CHARACTER (LEN=mls)                                           :: SnapshotFileFormat
@@ -7657,6 +7660,18 @@ IF (found) THEN
     parfind = ' '
     CALL read_logical(nout,lchar,parchar,parfind,back_flow_closed)
 
+    !! Evapotranspiration
+
+    evapofix = .FALSE.
+    evapotimeseries = .FALSE.
+
+    CALL read_evapotranspiration(nout,nx,ny,nz,evapofile,evapovalue,lfile,evapofix,evapotimeseries,EvapoFileFormat)
+
+    IF (evapotimeseries) THEN
+    
+    ENDIF
+
+    
 !!!  IF (isaturate == 1) THEN
     CALL read_gaspump(nout,nx,ny,nz,nchem,ngaspump)
 !!!  END IF
