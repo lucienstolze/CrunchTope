@@ -645,7 +645,7 @@ integer :: rank, ierror
 character(25) :: fn
 #endif
 
-ALLOCATE(realmult(1000))
+ALLOCATE(realmult(2000))
 
 pi = DACOS(-1.0d0)
 
@@ -7671,7 +7671,7 @@ IF (found) THEN
     
     ENDIF
 
-    
+
 !!!  IF (isaturate == 1) THEN
     CALL read_gaspump(nout,nx,ny,nz,nchem,ngaspump)
 !!!  END IF
