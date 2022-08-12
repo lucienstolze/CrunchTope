@@ -634,7 +634,7 @@ IF (CalculateFlow) THEN
 
   END IF
 
-  IF (evaposeries) THEN
+  IF (evapotimeseries) THEN
 
     IF (TS_1year) THEN
       time_norm=time-floor(time)

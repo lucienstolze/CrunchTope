@@ -271,7 +271,7 @@ IF (transpitimeseries .AND. Richards) THEN
 
 END IF
 
-IF (evaposeries .AND. Richards) THEN
+IF (evapotimeseries .AND. Richards) THEN
 
   IF (TS_1year) THEN
     time_norm=time-floor(time)
