@@ -43,12 +43,13 @@
 !!!      ****************************************
 
 
-SUBROUTINE read_evapotranspiration(nout,nx,ny,nz,evapofile,evapovalue,lfile,evapofix,evapotimeseries,FileFormatType)
+SUBROUTINE read_transpiration(nout,nx,ny,nz,transpifile,rate,lfile,boolfix,booltimeseries,numcells,tslength)
 USE crunchtype
 USE CrunchFunctions
 USE params
 USE flow
 USE strings
+USE medium
 
 IMPLICIT NONE
 
@@ -59,11 +60,12 @@ INTEGER(I4B), INTENT(IN)                                    :: nx
 INTEGER(I4B), INTENT(IN)                                    :: ny
 INTEGER(I4B), INTENT(IN)                                    :: nz
 INTEGER(I4B), INTENT(OUT)                                   :: lfile
-CHARACTER (LEN=mls), INTENT(OUT)                            :: evapofile
-REAL(DP), INTENT(OUT)                                       :: evapovalue
-LOGICAL(LGT), INTENT(IN OUT)                                :: evapofix
-LOGICAL(LGT), INTENT(IN OUT)                                :: evapotimeseries
-CHARACTER (LEN=mls), INTENT(OUT)                            :: FileFormatType
+INTEGER(I4B), INTENT(OUT)                                   :: tslength
+CHARACTER (LEN=mls), INTENT(OUT)                            :: transpifile
+REAL(DP), INTENT(OUT)                                       :: rate !rate of transpiration in mm/year
+INTEGER(I4B), INTENT(OUT)                                   :: numcells !nb of cells in which transpiration is active
+LOGICAL(LGT), INTENT(IN OUT)                                :: boolfix
+LOGICAL(LGT), INTENT(IN OUT)                                :: booltimeseries
 
 !  Internal variables and arrays
 
@@ -77,8 +79,9 @@ INTEGER(I4B)                                                :: nlen1
 INTEGER(I4B)                                                :: lenformat
 
 nxyz = nx*ny*nz
-evapofile = ' '
-evapovalue = 0
+transpifile = ' '
+rate = 0.0d0
+numcells = 1.0d0
 
 REWIND nout
 
@@ -92,61 +95,80 @@ IF(ls /= 0) THEN
   lzs=ls
   CALL convan(ssch,lzs,res)
   
-  IF (ssch == 'evapotranspiration') THEN
+  IF (ssch == 'transpiration') THEN
     id = ids + ls
     CALL sschaine(zone,id,iff,ssch,ids,ls)
     IF(ls /= 0) THEN
       lzs=ls
-!!  *****************************************************************     
-    !!check for numerical values
-    CALL convan(ssch,lzs,res)
-    IF (res == 'n') THEN
-    evapofix = .true.
-    evapovalue = DNUM(ssch)
-!!  *****************************************************************
-    !!check for the name of timeseries file
-    ELSEIF (res /= 'n') THEN
-      CALL stringtype(ssch,lzs,res)
-      evapofile = ssch
-      lfile = ls
-      evapotimeseries = .true.
-!!    Now, check for a file format
-      id = ids + ls
-      CALL sschaine(zone,id,iff,ssch,ids,ls)
-      lenformat = ls
-      CALL majuscules(ssch,lenformat)
-      IF (ls /= 0) THEN
-        IF (ssch == 'singlecolumn') THEN
-          FileFormatType = 'SingleColumn'
-        ELSE IF (ssch == 'continuousread') THEN
-          FileFormatType = 'ContinuousRead'
-        ELSE IF (ssch == 'unformatted') THEN
-          FileFormatType = 'Unformatted' 
-        ELSE IF (ssch == 'distanceplusvariable' .OR. ssch == 'fullform' .OR. ssch == 'full') THEN
-          FileFormatType = 'FullForm'    
-        ELSE IF (ssch == 'singlefile3d') THEN
-          FileFormatType = 'SingleFile3D'
-        ELSE
-          WRITE(*,*)
-          WRITE(*,*) ' File format not recognized: ', ssch(1:lenformat)
-          WRITE(*,*)
-          READ(*,*)
-          STOP
-        ENDIf
-      ELSE    !! No file format provided, so assume default
-        !!FileFormatType = 'SingleColumn'
+      !!  *****************************************************************     
+      !!check for number of cells
+      CALL convan(ssch,lzs,res)
+      IF (res == 'n') THEN
+      numcells = DNUM(ssch)
+      ELSE
         WRITE(*,*)
-        WRITE(*,*) ' No file format following "read_pumptimeseriesfile" in FLOW section '
+        WRITE(*,*) ' Number of cells must be provided for transpiration '
         WRITE(*,*)
         READ(*,*)
       STOP
       ENDIF
-    ENDIF
-!!  *****************************************************************
+
+
+      id = ids + ls
+      CALL sschaine(zone,id,iff,ssch,ids,ls)
+      IF(ls /= 0) THEN
+          lzs=ls
+          !!  *****************************************************************     
+          !!check for numerical values
+          CALL convan(ssch,lzs,res)
+          IF (res == 'n') THEN
+              boolfix = .true.
+              rate = DNUM(ssch)
+              rate = (rate/1000)*dxx(nx)*dzz(nx,ny,nz)/numcells ! convert in mm/year in m3/year 
+              !and divide by number of cells
+              !!  *****************************************************************
+              !!check for the name of timeseries file
+          ELSEIF (res /= 'n') THEN
+              CALL stringtype(ssch,lzs,res)
+              transpifile = ssch
+              lfile = ls
+              booltimeseries = .true.
+              
+              id = ids + ls
+      CALL sschaine(zone,id,iff,ssch,ids,ls)
+        IF(ls /= 0) THEN
+        lzs=ls
+        CALL convan(ssch,lzs,res)
+        IF (res == 'n') THEN
+        tslength = int(DNUM(ssch))
+        ELSE
+          WRITE(*,*)
+          WRITE(*,*) ' Must provide a numerical value for length time series transpi'
+          WRITE(*,*)
+          READ(*,*)
+          STOP  
+        ENDIF
+      ELSE
+        WRITE(*,*)
+        WRITE(*,*) ' Must provide a length for time series transpi '
+        WRITE(*,*)
+        READ(*,*)
+        STOP  
+        ENDIF
+              
+          ENDIF
+      ELSE
+        WRITE(*,*)
+        WRITE(*,*) ' Must provide either value or time series for transpiration '
+        WRITE(*,*)
+        READ(*,*)
+        STOP
+      ENDIF
+      !!  *****************************************************************
 
     ELSE
       WRITE(*,*)
-      WRITE(*,*) ' No info provided on evapo '
+      WRITE(*,*) ' No info provided on transpi '
       WRITE(*,*)
       READ(*,*)
       STOP
@@ -162,4 +184,4 @@ ELSE         ! No string found
 END IF
 
 1000 RETURN
-END SUBROUTINE read_evapotranspiration
+END SUBROUTINE read_transpiration

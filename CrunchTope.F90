@@ -624,6 +624,25 @@ IF (CalculateFlow) THEN
       END IF
     END IF
 
+
+  IF (transpitimeseries) THEN
+
+    IF (TS_1year) THEN
+      time_norm=time-floor(time)
+    CALL  interp3(time_norm,delt,t_transpi,qt_transpi(:),transpirate,size(qt_transpi(:)))
+      END IF
+
+  END IF
+
+  IF (evaposeries) THEN
+
+    IF (TS_1year) THEN
+      time_norm=time-floor(time)
+    CALL  interp3(time_norm,delt,t_evapo,qt_evapo(:),evaporate,size(qt_evapo(:)))
+      END IF
+
+  END IF
+
   SteadyFlow = .FALSE.
 
   CALL CrunchPETScInitializePressure(nx,ny,nz,userP,ierr,xvecP,bvecP,amatP)

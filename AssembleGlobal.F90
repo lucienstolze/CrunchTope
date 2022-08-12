@@ -262,6 +262,23 @@ IF (pumptimeseries .AND. Richards) THEN
   END IF
 END IF
 
+IF (transpitimeseries .AND. Richards) THEN
+
+  IF (TS_1year) THEN
+    time_norm=time-floor(time)
+  CALL  interp3(time_norm,delt,t_transpi,qt_transpi(:),transpirate,size(qt_transpi(:)))
+    END IF
+
+END IF
+
+IF (evaposeries .AND. Richards) THEN
+
+  IF (TS_1year) THEN
+    time_norm=time-floor(time)
+  CALL  interp3(time_norm,delt,t_evapo,qt_evapo(:),evaporate,size(qt_evapo(:)))
+    END IF
+
+END IF
 
 !!!  Do the boundaries first
 

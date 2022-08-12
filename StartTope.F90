@@ -630,8 +630,9 @@ INTEGER(I4B)                                                  :: lfile2
 CHARACTER (LEN=mls)                          :: watertablefile
 CHARACTER (LEN=mls)                          :: WatertableFileFormat
 CHARACTER (LEN=mls)                          :: evapofile
-REAL(DP)                                     :: evapovalue
-CHARACTER (LEN=mls)                          :: EvapoFileFormat
+CHARACTER (LEN=mls)                          :: transpifile
+INTEGER(I4B)                                                  :: tslength
+REAL(DP), DIMENSION(:), ALLOCATABLE      :: realmult_dum
 
 REAL(DP), DIMENSION(:,:,:), ALLOCATABLE      :: check3
 CHARACTER (LEN=mls)                                           :: SnapshotFileFormat
@@ -645,6 +646,7 @@ integer :: rank, ierror
 character(25) :: fn
 #endif
 
+ALLOCATE(realmult_dum(2000))
 ALLOCATE(realmult(2000))
 
 pi = DACOS(-1.0d0)
@@ -6387,8 +6389,9 @@ IF (found) THEN
   CALL stringlen(FileTemp,FileNameLength)
   do while (ierr == 0)
     lenarray = lenarray + 1
-    READ(23,*,iostat=IERR) realmult(lenarray) 
+    READ(23,*,iostat=IERR) realmult_dum(lenarray) 
   enddo
+  realmult=realmult_dum(1:lenarray-1)
   ENDIF
   ENDIF
 
@@ -7660,16 +7663,6 @@ IF (found) THEN
     parfind = ' '
     CALL read_logical(nout,lchar,parchar,parfind,back_flow_closed)
 
-    !! Evapotranspiration
-
-    evapofix = .FALSE.
-    evapotimeseries = .FALSE.
-
-    CALL read_evapotranspiration(nout,nx,ny,nz,evapofile,evapovalue,lfile,evapofix,evapotimeseries,EvapoFileFormat)
-
-    IF (evapotimeseries) THEN
-    
-    ENDIF
 
 
 !!!  IF (isaturate == 1) THEN
@@ -10286,6 +10279,43 @@ dspz = 0.0
 !      write(*,*)
 !      pause
 
+  !! Evapotranspiration
+
+  evapofix = .FALSE.
+  evapotimeseries = .FALSE.
+  transpifix = .FALSE.
+  transpitimeseries = .FALSE.
+  CALL read_evaporation(nout,nx,ny,nz,evapofile,evaporate,lfile,evapofix,evapotimeseries,tslength)
+  IF (evapotimeseries) THEN
+    IF (ALLOCATED(t_evapo)) THEN
+      DEALLOCATE(t_evapo)
+    END IF
+    IF (ALLOCATED(qt_evapo)) THEN
+      DEALLOCATE(qt_evapo)
+    END IF
+    ALLOCATE(t_evapo(tslength))
+    ALLOCATE(qt_evapo(tslength))
+    CALL read_timeseries2(nout,nx,ny,nz,t_evapo,qt_evapo,lfile,evapofile,tslength)
+    evaporate = qt_evapo(1)
+    !STOP
+  ENDIF
+  CALL read_transpiration(nout,nx,ny,nz,transpifile,transpirate,lfile,transpifix,transpitimeseries,transpicells,tslength)
+  IF (transpitimeseries) THEN
+    IF (ALLOCATED(t_transpi)) THEN
+      DEALLOCATE(t_transpi)
+    END IF
+    IF (ALLOCATED(qt_transpi)) THEN
+      DEALLOCATE(qt_transpi)
+    END IF
+    ALLOCATE(t_transpi(tslength))
+    ALLOCATE(qt_transpi(tslength))
+    CALL read_timeseries2(nout,nx,ny,nz,t_transpi,qt_transpi,lfile,transpifile,tslength)
+    qt_transpi=qt_transpi/transpicells 
+    transpirate = qt_transpi(1)
+    !WRITE(*,*) transpirate
+   ! STOP
+  ENDIF
+  
 !!!   ******************  NMM Coupling  ****************************************************
 
 

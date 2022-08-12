@@ -190,7 +190,4 @@ MODULE transport
 REAL(DP), DIMENSION(:,:,:), ALLOCATABLE          :: us
 REAL(DP), DIMENSION(:,:,:), ALLOCATABLE          :: vs
 
-! Lucien Stolze: evapotranspiration
-LOGICAL(LGT)                                     :: evapofix
-LOGICAL(LGT)                                     :: evapotimeseries
 END module transport

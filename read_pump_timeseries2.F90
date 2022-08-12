@@ -43,10 +43,6 @@ INTEGER(I4B)                                                :: jz
 REAL(DP)                                               :: tpdis
 REAL(DP)                                               :: locpdis
 CHARACTER (LEN=mls)                                           :: FileTemp
-REAL(DP)                                                      :: xdum
-REAL(DP)                                                      :: ydum
-REAL(DP)                                                      :: zdum
-REAL(DP)                                                      :: tottime
 REAL(DP)                                                      :: check
 INTEGER(I4B)                                                   :: tp
 INTEGER(I4B)                                                   :: locp

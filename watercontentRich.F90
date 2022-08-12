@@ -73,13 +73,23 @@ CHARACTER (LEN=1)                                                     :: Coordin
 
 REAL(DP)                                                              :: pumpterm
 INTEGER(I4B)                                                          :: npz
+INTEGER(I4B)                                                          :: dummy
 
 dt = dtyr * 365 * 86400
 !   calculate darcy fluxes
 
+
+IF (ALLOCATED(transpisoluteflux)) THEN
+  DEALLOCATE(transpisoluteflux)
+END IF
+ALLOCATE(transpisoluteflux(nx,ny,nz))
+
 DO jz = 1,nz
   DO jy = 1,ny
     DO jx = 1,nx
+
+      transpisoluteflux(jx,jy,jz) = 0.d0 !m3/yr flux of solutes through transpiration
+
       !IF (qy(jx,ny,jz)<=0 .and. back_flow_closed) then
       !  qy(jx,ny,jz)=0
       !END IF
@@ -89,21 +99,42 @@ DO jz = 1,nz
                                         +(dt*coef/dyy(jy))*(-qy(jx,jy,jz) + qy(jx,jy-1,jz))/secyr  &
                                         + (dt*coef/dzz(jx,jy,jz))*(-qz(jx,jy,jz) + qz(jx,jy,jz-1))/secyr
             
-!If extraction pump define at top boundary cells (lucienstolze 27102021):
-  !IF (activecellPressure(jx,jy-1,jz) == 0) THEN
-  !  pumpterm = 0.0d0
-  !  IF (wells .OR. pumptimeseries) THEN
-  !    DO npz = 1,npump(jx,jy,jz)
-  !      IF (qg(npz,jx,jy,jz) < 0) THEN !
-  !      pumpterm = pumpterm + dt*qg(npz,jx,jy,jz)/(secyr*dxx(jx)*dyy(jy)*dzz(jx,jy,jz))
-  !      ENDIF
-  !    END DO
-  ! IF (wc(jx,jy,jz) + pumpterm < 0) THEN
-  ! pumpterm = -wc(jx,jy,jz)
-  ! END IF
-  !  wc(jx,jy,jz) = wc(jx,jy,jz) + pumpterm  
-  !  ENDIF
-  !ENDIF 
+!If evaporation is defined: only impact top cell (lucienstolze 11082022):
+  IF (evapofix .OR. evapotimeseries) THEN                                      
+    IF (activecellPressure(jx,jy,jz) == 1 .AND. activecellPressure(jx,jy-1,jz) == 0) THEN
+       pumpterm = 0.0d0
+       pumpterm = pumpterm + dt*evaporate/(secyr*dxx(jx)*dyy(jy)*dzz(jx,jy,jz))
+       IF (wc(jx,jy,jz) + pumpterm < 0) THEN
+       pumpterm = -wc(jx,jy,jz)
+       END IF
+       wc(jx,jy,jz) = wc(jx,jy,jz) + pumpterm  
+    ENDIF
+  ENDIF 
+
+!If transpiration is defined: impact all cells defined by the user (lucienstolze 11082022):
+  
+  
+
+  IF (transpifix .OR. transpitimeseries) THEN
+    IF (activecellPressure(jx,jy,jz) == 1 .AND. jy-transpicells <= 0 ) THEN
+      pumpterm = 0.0d0
+      pumpterm = pumpterm + dt*transpirate/(secyr*dxx(jx)*dyy(jy)*dzz(jx,jy,jz))
+      IF (wc(jx,jy,jz) + pumpterm < 0) THEN
+      pumpterm = -wc(jx,jy,jz)
+      END IF
+      wc(jx,jy,jz) = wc(jx,jy,jz) + pumpterm    
+    ELSEIF (activecellPressure(jx,jy,jz) == 1 .AND. activecellPressure(jx,jy-transpicells,jz) == 0) THEN
+        pumpterm = 0.0d0
+        pumpterm = pumpterm + dt*transpirate/(secyr*dxx(jx)*dyy(jy)*dzz(jx,jy,jz))
+        IF (wc(jx,jy,jz) + pumpterm < 0) THEN
+        pumpterm = -wc(jx,jy,jz)
+        END IF
+        wc(jx,jy,jz) = wc(jx,jy,jz) + pumpterm  
+  transpisoluteflux(jx,jy,jz) = pumpterm*secyr*dxx(jx)*dyy(jy)*dzz(jx,jy,jz)/dt !m3/yr flux of solutes through transpiration
+    ENDIF
+  
+  ENDIF 
+  
 
 ! add source term if not along boundary
 !             IF (jx > 1 .AND. jx < nx) THEN
