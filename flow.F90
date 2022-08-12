@@ -219,4 +219,5 @@ REAL(DP)                                         :: transpirate
 INTEGER(I4B)                                     :: transpicells
 REAL(DP), DIMENSION(:,:,:), ALLOCATABLE          :: transpiflux
 REAL(DP), DIMENSION(:,:,:), ALLOCATABLE          :: evapoflux
+LOGICAL(LGT)                                     :: transpisoluteflux
 END MODULE flow

@@ -910,6 +910,13 @@ DO i = 1,ncomp
     
   END IF
 
+
+  IF ((transpifix .OR. transpitimeseries) .AND. Richards) THEN
+    IF (transpisoluteflux .AND. transpiflux(jx,jy,jz)<0) THEN
+  source = source + xgram(jx,jy,jz)*transpiflux(jx,jy,jz)*rotemp*scond(i,intbnd(npz,jx,jy,jz))/CellVolume
+    ENDIF
+  ENDIF
+
   GasSource = 0.0
 
 !!!  IF (isaturate == 1) THEN

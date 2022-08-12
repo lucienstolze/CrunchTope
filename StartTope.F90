@@ -10315,6 +10315,11 @@ dspz = 0.0
     !WRITE(*,*) transpirate
    ! STOP
   ENDIF
+
+    transpisoluteflux = .FALSE.
+    parchar = 'transpisoluteflux'
+    parfind = ' '
+    CALL read_logical(nout,lchar,parchar,parfind,transpisoluteflux)
   
 !!!   ******************  NMM Coupling  ****************************************************
 
