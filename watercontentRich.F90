@@ -79,16 +79,22 @@ dt = dtyr * 365 * 86400
 !   calculate darcy fluxes
 
 
-IF (ALLOCATED(transpisoluteflux)) THEN
-  DEALLOCATE(transpisoluteflux)
+IF (ALLOCATED(transpiflux)) THEN
+  DEALLOCATE(transpiflux)
 END IF
-ALLOCATE(transpisoluteflux(nx,ny,nz))
+ALLOCATE(transpiflux(nx,ny,nz))
+
+IF (ALLOCATED(evapoflux)) THEN
+  DEALLOCATE(evapoflux)
+END IF
+ALLOCATE(evapoflux(nx,ny,nz))
 
 DO jz = 1,nz
   DO jy = 1,ny
     DO jx = 1,nx
 
-      transpisoluteflux(jx,jy,jz) = 0.d0 !m3/yr flux of solutes through transpiration
+      transpiflux(jx,jy,jz) = 0.d0 !m3/yr flux of solutes through transpiration
+      evapoflux(jx,jy,jz) = 0.d0 !m3/yr flux of solutes through transpiration
 
       !IF (qy(jx,ny,jz)<=0 .and. back_flow_closed) then
       !  qy(jx,ny,jz)=0
@@ -108,6 +114,7 @@ DO jz = 1,nz
        pumpterm = -wc(jx,jy,jz)
        END IF
        wc(jx,jy,jz) = wc(jx,jy,jz) + pumpterm  
+       evapoflux(jx,jy,jz) = pumpterm*secyr*dxx(jx)*dyy(jy)*dzz(jx,jy,jz)/dt !m3/yr flux of solutes through transpiration
     ENDIF
   ENDIF 
 
@@ -130,7 +137,7 @@ DO jz = 1,nz
         pumpterm = -wc(jx,jy,jz)
         END IF
         wc(jx,jy,jz) = wc(jx,jy,jz) + pumpterm  
-  transpisoluteflux(jx,jy,jz) = pumpterm*secyr*dxx(jx)*dyy(jy)*dzz(jx,jy,jz)/dt !m3/yr flux of solutes through transpiration
+  transpiflux(jx,jy,jz) = pumpterm*secyr*dxx(jx)*dyy(jy)*dzz(jx,jy,jz)/dt !m3/yr flux of solutes through transpiration
     ENDIF
   
   ENDIF 

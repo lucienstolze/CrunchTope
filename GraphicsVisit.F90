@@ -686,6 +686,48 @@ END IF
   END DO
   CLOSE(UNIT=8,STATUS='keep')
 
+if ((evapofix .OR. evapotimeseries) .AND. Richards) then
+
+  fn='evapoflux'
+  ilength = 8
+  CALL newfile(fn,suf1,fnv,nint,ilength)
+  OPEN(UNIT=8,FILE=fnv, ACCESS='sequential',STATUS='unknown')
+  WRITE(8,*) 'TITLE = "Evapoflux (m/yr)" '
+  WRITE(8,2013)
+  2013 FORMAT('VARIABLES = "X"          "Y"              "Z"           "Y Velocity"     ')
+  WRITE(8,*) 'ZONE I=', nx,  ', J=',ny, ', K=',nz, ' F=POINT'
+    DO jz = 1,nz
+      DO jy = 1,ny
+        DO jx = 1,nx
+          WRITE(8,191) x(jx)*OutputDistanceScale,y(jy)*OutputDistanceScale, &
+                z(jz)*OutputDistanceScale,evapoflux(jx,jy,jz)
+      END DO
+    END DO
+  END DO
+  CLOSE(UNIT=8,STATUS='keep')
+
+endif
+
+if ((evapofix .OR. evapotimeseries) .AND. Richards) then
+
+  fn='transpiflux'
+  ilength = 8
+  CALL newfile(fn,suf1,fnv,nint,ilength)
+  OPEN(UNIT=8,FILE=fnv, ACCESS='sequential',STATUS='unknown')
+  WRITE(8,*) 'TITLE = "Transpiflux (m/yr)" '
+  WRITE(8,2013)
+  WRITE(8,*) 'ZONE I=', nx,  ', J=',ny, ', K=',nz, ' F=POINT'
+    DO jz = 1,nz
+      DO jy = 1,ny
+        DO jx = 1,nx
+          WRITE(8,191) x(jx)*OutputDistanceScale,y(jy)*OutputDistanceScale, &
+                z(jz)*OutputDistanceScale,transpiflux(jx,jy,jz)
+      END DO
+    END DO
+  END DO
+  CLOSE(UNIT=8,STATUS='keep')
+
+endif
 
   !  Write out pressure
 

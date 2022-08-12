@@ -217,5 +217,6 @@ LOGICAL(LGT)                                     :: transpifix
 LOGICAL(LGT)                                     :: transpitimeseries
 REAL(DP)                                         :: transpirate
 INTEGER(I4B)                                     :: transpicells
-REAL(DP), DIMENSION(:,:,:), ALLOCATABLE          :: transpisoluteflux
+REAL(DP), DIMENSION(:,:,:), ALLOCATABLE          :: transpiflux
+REAL(DP), DIMENSION(:,:,:), ALLOCATABLE          :: evapoflux
 END MODULE flow
