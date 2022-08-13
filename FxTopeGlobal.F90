@@ -912,8 +912,16 @@ DO i = 1,ncomp
 
 
   IF ((transpifix .OR. transpitimeseries) .AND. Richards) THEN
-    IF (transpisoluteflux .AND. transpiflux(jx,jy,jz)<0) THEN
-  source = source + xgram(jx,jy,jz)*transpiflux(jx,jy,jz)*rotemp*scond(i,intbnd(npz,jx,jy,jz))/CellVolume
+    IF (jx /=0 .AND. jx /=nx+1 .AND. jy /=0 .AND. jy /=ny+1 .AND. jz==1) THEN
+     IF (transpisoluteflux .AND. transpiflux(jx,jy,jz)<0) THEN
+        source = source + xgram(jx,jy,jz)*transpiflux(jx,jy,jz)*rotemp*s(i,jx,jy,jz)/CellVolume
+    ENDIF
+  ENDIF
+  ENDIF
+
+  IF (transpifix .AND. .not. Richards .AND. transpisoluteflux .AND. transpirate<0) THEN
+    IF (jy > 0 .AND. jy <= transpicells) THEN
+  source = source + xgram(jx,jy,jz)*transpirate*rotemp*s(i,jx,jy,jz)/CellVolume
     ENDIF
   ENDIF
 
