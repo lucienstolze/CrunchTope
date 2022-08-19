@@ -123,7 +123,7 @@ DO jz = 1,nz
   
 
   IF (transpifix .OR. transpitimeseries) THEN
-    IF (activecellPressure(jx,jy,jz) == 1 .AND. jy-transpicells <= 0 ) THEN
+    IF (activecellPressure(jx,jy,jz) == 1 .AND. jy-transpicells == 0 ) THEN
       pumpterm = 0.0d0
       pumpterm = pumpterm + dt*transpirate/(secyr*dxx(jx)*dyy(jy)*dzz(jx,jy,jz))
       IF (wc(jx,jy,jz) + pumpterm < 0) THEN
