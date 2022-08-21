@@ -108,16 +108,19 @@ DO jz = 1,nz
                                         + (dt*coef/dzz(jx,jy,jz))*(-qz(jx,jy,jz) + qz(jx,jy,jz-1))/secyr
             
 !If evaporation is defined: only impact top cell (lucienstolze 11082022):
-  IF (evapofix .OR. evapotimeseries) THEN                                      
+  IF (evapofix .OR. evapotimeseries) THEN           
+    pumpterm = 0.0d0                           
     IF (activecellPressure(jx,jy,jz) == 1 .AND. activecellPressure(jx,jy-1,jz) == 0) THEN
-       pumpterm = 0.0d0
+       
        pumpterm = pumpterm + dt*evaporate/(secyr*dxx(jx)*dyy(jy)*dzz(jx,jy,jz))
-       IF (wc(jx,jy,jz) + pumpterm < 0) THEN
-       pumpterm = -wc(jx,jy,jz)
+       
+       IF ((wc(jx,jy,jz) - wcr(jx,jy,jz) + pumpterm) <= 1e-3) THEN
+        pumpterm = -(wc(jx,jy,jz)-wcr(jx,jy,jz)-1e-3)
        END IF
        wc(jx,jy,jz) = wc(jx,jy,jz) + pumpterm  
-       evapoflux(jx,jy,jz) = pumpterm*secyr*dxx(jx)*dyy(jy)*dzz(jx,jy,jz)/dt !m3/yr flux of solutes through transpiration
+       
     ENDIF
+    evapoflux(jx,jy,jz) = pumpterm*secyr*dxx(jx)*dyy(jy)*dzz(jx,jy,jz)/dt !m3/yr flux of solutes through transpiration
   ENDIF 
 
 !If transpiration is defined: impact all cells defined by the user (lucienstolze 11082022):

@@ -10321,23 +10321,31 @@ dspz = 0.0
     parfind = ' '
     CALL read_logical(nout,lchar,parchar,parfind,transpisoluteflux)
   
-    IF (transpisoluteflux) THEN
+   ! IF (transpisoluteflux) THEN
       IF (ALLOCATED(transpiflux)) THEN
         DEALLOCATE(transpiflux)
         ALLOCATE(transpiflux(nx,ny,nz))
       ELSE
         ALLOCATE(transpiflux(nx,ny,nz))
       END IF
+
+      IF (ALLOCATED(evapoflux)) THEN
+        DEALLOCATE(evapoflux)
+        ALLOCATE(evapoflux(nx,ny,nz))
+      ELSE
+        ALLOCATE(evapoflux(nx,ny,nz))
+      END IF
       
       DO jz = 1,nz
         DO jy = 1,ny
           DO jx = 1,nx
             transpiflux(jx,jy,jz)=0
+            evapoflux(jx,jy,jz)=0
           ENDDO
         ENDDO
       ENDDO
 
-    ENDIF
+    !ENDIF
 !!!   ******************  NMM Coupling  ****************************************************
 
 
