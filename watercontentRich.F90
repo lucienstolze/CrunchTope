@@ -74,6 +74,8 @@ CHARACTER (LEN=1)                                                     :: Coordin
 REAL(DP)                                                              :: pumpterm
 INTEGER(I4B)                                                          :: npz
 INTEGER(I4B)                                                          :: dummy
+REAL(DP)                                                              :: dummy1
+REAL(DP)                                                              :: dummy2
 
 dt = dtyr * 365 * 86400
 !   calculate darcy fluxes
@@ -127,15 +129,16 @@ DO jz = 1,nz
     IF (activecellPressure(jx,jy,jz) == 1 .AND. jy-transpicells <= 0 ) THEN
       
       pumpterm = pumpterm + dt*transpirate/(secyr*dxx(jx)*dyy(jy)*dzz(jx,jy,jz))
-      IF (wc(jx,jy,jz) + pumpterm < 0) THEN
-      pumpterm = -wc(jx,jy,jz)
+      IF ((wc(jx,jy,jz) - wcr(jx,jy,jz) + pumpterm) <= 1e-3) THEN
+        !STOP
+      pumpterm = -(wc(jx,jy,jz)-wcr(jx,jy,jz)-1e-3)
       END IF
       wc(jx,jy,jz) = wc(jx,jy,jz) + pumpterm    
   
     ELSEIF (activecellPressure(jx,jy,jz) == 1 .AND. activecellPressure(jx,jy-transpicells,jz) == 0) THEN
         pumpterm = pumpterm + dt*transpirate/(secyr*dxx(jx)*dyy(jy)*dzz(jx,jy,jz))
-        IF (wc(jx,jy,jz) + pumpterm < 0) THEN
-        pumpterm = -wc(jx,jy,jz)
+        IF ((wc(jx,jy,jz) - wcr(jx,jy,jz) + pumpterm) <= 1e-3) THEN
+        pumpterm = -(wc(jx,jy,jz)-wcr(jx,jy,jz)-1e-3)
         END IF
         wc(jx,jy,jz) = wc(jx,jy,jz) + pumpterm  
     ENDIF

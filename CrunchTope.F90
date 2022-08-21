@@ -1393,8 +1393,8 @@ DO WHILE (nn <= nend)
             FORALL (jx=1:nx, jy=1:ny, jz=1:nz)
               pres(jx,jy,jz) = head(jx,jy,jz) * ro(jx,jy,jz) * 9.8d0
             END FORALL
-           !CALL vanGenuchten(nx,ny,nz)
-           !CALL velocalcRich(nx,ny,nz,delt)
+           CALL vanGenuchten(nx,ny,nz)
+           CALL velocalcRich(nx,ny,nz,delt)
         ELSE
             CALL velocalc(nx,ny,nz)
         END IF
