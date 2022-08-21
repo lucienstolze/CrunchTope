@@ -339,6 +339,14 @@ DO jz = 1,nz
                       END DO
                     END IF
 
+                    IF (transpifix .OR. transpitimeseries) THEN
+                          pumpterm = pumpterm + visc*ro(jx,jy,jz)*transpiflux(jx,jy,jz)/(secyr*dxx(jx)*dyy(jy)*dzz(jx,jy,jz))
+                    END IF
+
+                    IF (evapofix .OR. evapotimeseries) THEN
+                        pumpterm = pumpterm + visc*ro(jx,jy,jz)*evapoflux(jx,jy,jz)/(secyr*dxx(jx)*dyy(jy)*dzz(jx,jy,jz))
+                    END IF
+
                     BvecCrunchP(j) = BvecCrunchP(j) + pumpterm
 
                     ! if pumpterm is along boundary, treat as a Neumann-type BC
