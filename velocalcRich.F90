@@ -173,7 +173,6 @@ DO jz = 1,nz
 
                 IF (pumpterm > 0.0d0 .AND. (wc(jx,jy+1,jz) + dt*pumpterm/dyy(jy) >= wcs(jx,jy+1,jz))) then
                 pumpterm = (wcs(jx,jy+1,jz) - wc(jx,jy+1,jz))*dyy(jy)/dt
-                !!STOP
                 ELSEIF (pumpterm < 0.0d0 .AND. (wc(jx,jy+1,jz)-wcr(jx,jy+1,jz)-1e-3) + dt*pumpterm/dyy(jy) <=0) THEN
                 pumpterm = (wc(jx,jy+1,jz)-wcr(jx,jy+1,jz)-1e-3)*dyy(jy)/dt
                 ENDIF
