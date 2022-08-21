@@ -920,8 +920,9 @@ DO i = 1,ncomp
   ENDIF
 
   IF (transpifix .AND. .not. Richards .AND. transpisoluteflux .AND. transpirate<0) THEN
-    IF (jy > 0 .AND. jy <= transpicells) THEN
+    IF (jx > 0 .AND. jx <= transpicells) THEN
   source = source + xgram(jx,jy,jz)*transpirate*rotemp*s(i,jx,jy,jz)/CellVolume
+  transpiflux(jx,jy,jz)=transpirate
     ENDIF
   ENDIF
 

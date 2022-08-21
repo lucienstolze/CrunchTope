@@ -441,6 +441,20 @@ IF (isaturate==1) THEN
   
 END IF
 
+if ((transpifix .OR. transpitimeseries)) then
+  2013 FORMAT('# Units: mm/yr')
+  fn='transpiflux'
+  ilength = 11
+  CALL newfile(fn,suf1,fnv,nint,ilength)
+  OPEN(UNIT=8,FILE=fnv, ACCESS='sequential',STATUS='unknown')
+  WRITE(8,*) 'TITLE = "Transpiflux (m/yr)" '
+  WRITE(8,2013)
+  DO jx = 1,nx
+          WRITE(8,184) x(jx)*OutputDistanceScale, transpiflux(jx,1,1)
+  END DO
+  CLOSE(UNIT=8,STATUS='keep')
+
+endif
 
 IF (nexchange > 0) THEN
   fn='exchange'
