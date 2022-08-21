@@ -131,7 +131,7 @@ DO jz = 1,nz
     pumpterm = 0.0d0
     IF (activecellPressure(jx,jy,jz) == 1 .AND. jy-transpicells <= 0 ) THEN
       
-      pumpterm = pumpterm + dt*transpirate/(secyr*dxx(jx)*dyy(jy)*dzz(jx,jy,jz))
+      pumpterm = pumpterm + dt*transpirate/(secyr*dxx(jx)*dyy(jy)*dzz(jx,jy,jz)) ! unitless
       IF ((wc(jx,jy,jz) - wcr(jx,jy,jz) + pumpterm) <= 1e-3) THEN
         !STOP
       pumpterm = -(wc(jx,jy,jz)-wcr(jx,jy,jz)-1e-3)

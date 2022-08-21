@@ -168,13 +168,14 @@ DO jz = 1,nz
                 pumpterm = 0.0d0 !pump located at jy+1 (positiv)
                 IF (wells .OR. pumptimeseries) THEN
                   DO npz = 1,npump(jx,jy+1,jz)
-                    pumpterm = pumpterm + qg(npz,jx,jy+1,jz)/(secyr*dxx(jx)*dzz(jx,jy+1,jz))
+                    pumpterm = pumpterm + qg(npz,jx,jy+1,jz)/(secyr*dxx(jx)*dzz(jx,jy+1,jz)) ! m/sec
                   END DO
 
-                IF (pumpterm > 0.0d0 .AND. room(jx,jy+1,jz) == 0.0d0) then
-                pumpterm = 0.0d0
-                ELSEIF (pumpterm < 0.0d0 .AND. wc(jx,jy+1,jz) == wcr(jx,jy+1,jz)) THEN
-                pumpterm = 0.0d0
+                IF (pumpterm > 0.0d0 .AND. (wc(jx,jy+1,jz) + dt*pumpterm/dyy(jy) >= wcs(jx,jy+1,jz))) then
+                pumpterm = (wcs(jx,jy+1,jz) - wc(jx,jy+1,jz))*dyy(jy)/dt
+                !!STOP
+                ELSEIF (pumpterm < 0.0d0 .AND. (wc(jx,jy+1,jz)-wcr(jx,jy+1,jz)-1e-3) + dt*pumpterm/dyy(jy) <=0) THEN
+                pumpterm = (wc(jx,jy+1,jz)-wcr(jx,jy+1,jz)-1e-3)*dyy(jy)/dt
                 ENDIF
 
                 IF (pumpterm /= 0.0d0) THEN
