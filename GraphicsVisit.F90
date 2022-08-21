@@ -708,7 +708,7 @@ if ((evapofix .OR. evapotimeseries) .AND. Richards) then
 
 endif
 
-if ((evapofix .OR. evapotimeseries) .AND. Richards) then
+if ((transpifix .OR. transpitimeseries) .AND. Richards) then
 
   fn='transpiflux'
   ilength = 8
