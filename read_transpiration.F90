@@ -124,9 +124,10 @@ IF(ls /= 0) THEN
           IF (res == 'n') THEN
               boolfix = .true.
               rate = DNUM(ssch)
-              rate = (rate/1000)*dxx(nx)*dzz(nx,ny,nz)/numcells ! convert in mm/year in m3/year 
               if (ny==1 .AND. nz==1) then !! 1D case
                 rate = (rate/1000)/numcells !! Converting from mm/year to m3/year
+              else
+                rate = (rate/1000)*dxx(nx)*dzz(nx,ny,nz)/numcells ! convert in mm/year in m3/year 
               endif
               !and divide by number of cells
               !!  *****************************************************************

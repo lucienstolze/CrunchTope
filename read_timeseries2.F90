@@ -108,9 +108,10 @@ ALLOCATE(qtout_dum(tslength))
       DO tp = 1,tslength
         READ(23,*,iostat=IERR) t_dum,q_dum
         tout_dum(tp) = t_dum
-        qtout_dum(tp) = ((q_dum)/1000.0d0)*dxx(nx)*dzz(nx,ny,nz) !! Converting from mm/year to m3/year for 2D case
         if (ny==1 .AND. nz==1) then !! 1D case
         qtout_dum(tp) = ((q_dum)/1000.0d0) !! Converting from mm/year to m3/year
+        else
+        qtout_dum(tp) = ((q_dum)/1000.0d0)*dxx(nx)*dzz(nx,ny,nz) !! Converting from mm/year to m3/year for 2D case
         endif
       END DO
       
