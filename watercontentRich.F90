@@ -73,9 +73,6 @@ CHARACTER (LEN=1)                                                     :: Coordin
 
 REAL(DP)                                                              :: pumpterm
 INTEGER(I4B)                                                          :: npz
-INTEGER(I4B)                                                          :: dummy
-REAL(DP)                                                              :: dummy1
-REAL(DP)                                                              :: dummy2
 
 dt = dtyr * 365 * 86400
 !   calculate darcy fluxes
