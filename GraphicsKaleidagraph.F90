@@ -404,6 +404,18 @@ DO jx = 0,nx
 END DO
 CLOSE(UNIT=8,STATUS='keep')
 
+fn='liquidsat'
+ilength = 9
+CALL newfile(fn,suf1,fnv,nint,ilength)
+OPEN(UNIT=8,FILE=fnv, ACCESS='sequential',STATUS='unknown')
+WRITE(8,2283) PrintTime
+jy = 1
+jz = 1
+DO jx = 1,nx
+  WRITE(8,184) x(jx)*OutputDistanceScale,satliq(jx,1,1)
+END DO
+CLOSE(UNIT=8,STATUS='keep')
+
 IF (isaturate==1) THEN
   
   117 FORMAT('# Units: mol gas/m2/year')
@@ -432,7 +444,7 @@ IF (isaturate==1) THEN
     END DO
     
     if (jx==0) THEN
-    WRITE(8,184) x(jx)*OutputDistanceScale,(gflux_hor(i),i=1,ngas)
+    WRITE(8,184) x(jx)*OutputDistanceScale-dxx(jx)/2,(gflux_hor(i),i=1,ngas)
     else
     WRITE(8,184) x(jx)*OutputDistanceScale+dxx(jx)/2,(gflux_hor(i),i=1,ngas)
     END IF

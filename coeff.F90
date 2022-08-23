@@ -610,13 +610,21 @@ DO jy = 1,ny
       ELSE
         dharm = GeometricMean(dumn,dumpy)
       END IF
-      
+
+      if (activecellPressure(jx,jy,jz) == 0 .AND. activecellPressure(jx,jy-1,jz) == 1 .AND. Richards) THEN
+      AreaN = dxx(jx)*dzz(jx,jy,jz)
+      dspn = avgro*dspy(jx,jy,jz) + dharm
+      dn = 0*AreaN*dspn/dyn
+      fn = AreaN*avgro*(qy(jx,jy,jz) + FluidBuryY(jy))
+      an = DMAX1(-fn,0.0D0) + dn
+      else
       AreaN = dxx(jx)*dzz(jx,jy,jz)
       dspn = avgro*dspy(jx,jy,jz) + dharm
       dn = AreaN*dspn/dyn
       fn = AreaN*avgro*(qy(jx,jy,jz) + FluidBuryY(jy))
       an = DMAX1(-fn,0.0D0) + dn
-      
+      endif
+
       avgro = 0.5d0*( ro(jx,jy-1,jz) + ro(jx,jy,jz) )
       
       IF (MeanDiffusion == 1) THEN
