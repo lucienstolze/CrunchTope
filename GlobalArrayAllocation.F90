@@ -74,6 +74,12 @@ IF (ALLOCATED(qy)) THEN
 ELSE
   ALLOCATE(qy(nx,0:ny,nz))
 END IF
+IF (ALLOCATED(avg_qy)) THEN
+  DEALLOCATE(avg_qy)
+  ALLOCATE(avg_qy(nx,0:ny,nz))
+ELSE
+  ALLOCATE(avg_qy(nx,0:ny,nz))
+END IF
 IF (ALLOCATED(qz)) THEN
   DEALLOCATE(qz)
   ALLOCATE(qz(nx,ny,0:nz))

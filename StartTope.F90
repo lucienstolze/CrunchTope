@@ -7588,6 +7588,8 @@ END IF
 
 !  Initialize flow variables
 
+avg_count=0
+
 readvelocity = .FALSE.
 readgasvelocity = .FALSE.
 WRITE(*,*) ' Reading flow block'

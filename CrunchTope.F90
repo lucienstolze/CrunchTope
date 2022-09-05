@@ -424,7 +424,8 @@ INTEGER(I4B)                                               :: i_substep
 
 REAL(DP)        :: time_norm
 REAL(DP)        :: qgdum
-
+REAL(DP)        :: avg_mark
+REAL(DP)        :: time_dum
 ! ******************** PETSC declarations ********************************
 PetscFortranAddr     userC(6),userD(6),userP(6),user(6)
 Mat                  amatpetsc,amatD,amatP
@@ -503,6 +504,8 @@ isaturate = 0
 dtmaxcour = 0.0
 iprnt = 0
 ncounter = 0
+time_dum = 0
+avg_mark = 1
 
 !!call def_time(CPU_unit)
 CALL StartTope(ncomp,nspec,nkin,nrct,ngas,npot,nx,ny,nz,data1,ipath,igamma,  &
@@ -2471,6 +2474,31 @@ DO jz = 1,nz
   END DO
 END DO
 
+IF (floor(time)>time_dum) THEN !if new year
+  time_dum = time_dum+1 ! year counter
+  avg_mark=1
+ENDIF
+
+IF (time-floor(time) >= 1-(1/365) .AND. avg_mark==1) THEN
+  DO jz = 1,nz
+    DO jy = 0,ny
+      DO jx = 1,nx
+            avg_qy(jx,jy,jz) = 0
+     END DO
+    END DO
+  END DO
+  avg_count=0
+  avg_mark=0
+ENDIF
+
+DO jz = 1,nz
+  DO jy = 0,ny
+    DO jx = 1,nx
+          avg_qy(jx,jy,jz) = (avg_qy(jx,jy,jz) + qy(jx,jy,jz)*delt)
+   END DO
+  END DO
+END DO
+avg_count=avg_count+delt
 
   time = time + delt
 

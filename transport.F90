@@ -190,4 +190,8 @@ MODULE transport
 REAL(DP), DIMENSION(:,:,:), ALLOCATABLE          :: us
 REAL(DP), DIMENSION(:,:,:), ALLOCATABLE          :: vs
 
+! Lucien Stolze: average over timestep for transient
+REAL(DP), DIMENSION(:,:,:),ALLOCATABLE         :: avg_qy
+REAL(DP)                                  :: avg_count
+
 END module transport
