@@ -2472,25 +2472,49 @@ DO jz = 1,nz
   END DO
 END DO
 
+!! CALCULATE AVERAGE OVER TIMESTEP
+
 IF (floor(time)>time_dum) THEN !if new year
   time_dum = time_dum+1 ! year counter
   DO jz = 1,nz
     DO jy = 0,ny
       DO jx = 1,nx
-            avg_qy(jx,jy,jz) = 0
+            avg_qy(jx,jy,jz) = 0 ! reinitialize array
      END DO
     END DO
   END DO
-  avg_count=0
+  avg_count=0 ! reinitialize counter
 ENDIF
 
 DO jz = 1,nz
   DO jy = 0,ny
     DO jx = 1,nx
           avg_qy(jx,jy,jz) = (avg_qy(jx,jy,jz) + qy(jx,jy,jz)*delt)
+        !   do i = 1,ncomp
+        !   avg_aqflux(i,jx,jy,jz) = avg_aqflux(jx,jy,jz) + &
+        !   (1000*s(i,jx,jy,jz)*qy(jx,jy,jz)*(1e6)/(1e4))*delt !!Aqueous fluxes [umol/cm2/yr]
+        ! end do
    END DO
   END DO
 END DO
+! DO jz = 1,nz
+!   DO jy = 1,ny
+!     DO jx = 1,nx
+!           do i = 1,ncomp
+!           avg_transpiflux(i,jx,jy,jz) = avg_transpiflux(jx,jy,jz) + &
+!           (1000*s(i,jx,jy,jz)*transpiflux(jx,jy,jz)*(1e6)/(1e4))*delt !!Transpi fluxes [umol/cm2/yr]
+!         end do
+!         DO i =1,ikin
+!           avg_aqrateflux(i,jx,jy,jz)=avg_aqrateflux(i,jx,jy,jz)+ &
+!           (1000*raq_tot(i,jx,jy,jz)*por(jx,jy,jz)*satliq(jx,jy,jz)*dyy(jy)*(1e6)/(1e4))*delt !!Aqueous rate fluxes [umol/cm2/yr]
+!         END DO
+!         DO i = 1,nrct
+!           avg_minrateflux(i,jx,jy,jz)=avg_minrateflux(i,jx,jy,jz)+ &
+!           (dppt(i,jx,jy,jz)*dyy(jy)*(1e6)/(1e4))*delt !!Mineral rate fluxes [umol/cm2/yr]
+!         END DO
+!    END DO
+!   END DO
+! END DO
 avg_count=avg_count+delt
 
   time = time + delt
