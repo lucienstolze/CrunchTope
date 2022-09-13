@@ -716,5 +716,10 @@ IF (ALLOCATED(dependk)) THEN
 ELSE
   ALLOCATE(dependk(mcomp,mreact,maqkin))
 END IF
-
+IF (ALLOCATED(actk)) THEN
+  DEALLOCATE(actk)
+  ALLOCATE(actk(mreact,maqkin))
+ELSE
+  ALLOCATE(actk(mreact,maqkin))
+END IF
 END SUBROUTINE FirstAllocation

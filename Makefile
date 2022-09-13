@@ -339,6 +339,9 @@ SOURCEF = \
           read_evaporation.F90\
           read_timeseries2.F90\
           interp3.F90\
+          read_tempreg.F90\
+          read_tempregion.F90\
+          read_tempts.F90\
           FRACTUREAPERTURE.F90\
 
 
@@ -678,6 +681,9 @@ OBJSF  =  crunchtype.o\
           read_transpiration.o\
           read_evaporation.o\
           read_timeseries2.o\
+          read_tempreg.o\
+          read_tempregion.o\
+          read_tempts.o\
           FRACTUREAPERTURE.o\
 
 LOCDIR   = ${CrunchTope_Dir}

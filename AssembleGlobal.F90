@@ -198,6 +198,7 @@ REAL(DP)        :: qgdum
 
 !! Time normalized used if time series only defined for 1 representative year:
 REAL(DP)        :: time_norm
+REAL(DP), DIMENSION(:), ALLOCATABLE                   :: temp_dum
 
 !********************* PETSc declarations ********************************
 PetscFortranAddr                                                    user(6)
@@ -279,6 +280,32 @@ IF (evapotimeseries .AND. Richards) THEN
     END IF
 
 END IF
+
+IF (RunTempts) THEN
+  IF (ALLOCATED(temp_dum)) THEN
+    DEALLOCATE(temp_dum)
+  END IF
+  ALLOCATE(temp_dum(nb_temp_ts))
+
+  IF (TS_1year) THEN
+    time_norm=time-floor(time)
+    DO i=1,nb_temp_ts
+  CALL  interp3(time_norm,delt,t_temp_ts,temp_ts(i,:),temp_dum(i),size(temp_ts(i,:)))
+    END DO
+    END IF
+
+      DO jz = 1,nz
+      DO jy = 1,ny
+      DO jx = 1,nx
+      DO i = 1,nb_temp_ts
+          IF (temp_region(jx,jy,jz) == reg_temp_ts(i)) THEN
+            t(jx,jy,jz) = temp_dum(i)
+          ENDIF
+      END DO
+      END DO
+      END DO
+      END DO
+ENDIF
 
 !!!  Do the boundaries first
 

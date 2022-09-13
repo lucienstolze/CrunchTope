@@ -635,7 +635,15 @@ INTEGER(I4B)                                                  :: tslength
 REAL(DP), DIMENSION(:), ALLOCATABLE      :: realmult_dum
 
 REAL(DP), DIMENSION(:,:,:), ALLOCATABLE      :: check3
+REAL(DP), DIMENSION(:,:,:), ALLOCATABLE      :: dummy1
 CHARACTER (LEN=mls)                                           :: SnapshotFileFormat
+
+CHARACTER (LEN=mls), DIMENSION(:), ALLOCATABLE              :: temptsfile
+REAL(DP)                                                    :: reg_temp_fix1
+REAL(DP)                                                    :: nb_temp_fix1
+REAL(DP)                                                    :: temp_fix1
+LOGICAL(LGT)                                :: boolfix
+LOGICAL(LGT)                                :: boolreg
 integer :: IERR = 0
 
 #if defined(ALQUIMIA)
@@ -684,6 +692,12 @@ constantpor = 1.0d0
 MinimumPorosity = 1.0D-14
 
 nscratch = 9
+
+! temperature time series lucien
+nb_temp_ts = 0
+nb_temp_fix = 0
+boolreg = .false.
+RunTempts=.false.
 
 iunit1 = 2
 iunit2 = 3
@@ -1870,6 +1884,26 @@ IF (found) THEN
     END IF
 
 
+    CALL read_tempreg(nout,dumstring,TemperatureFileFormat,boolreg)
+    IF (boolreg) THEN
+      jtemp = 3
+      TFile = dumstring
+    ENDIF
+
+    
+    IF (ALLOCATED(temptsfile)) THEN
+      DEALLOCATE(temptsfile)
+    END IF
+    ALLOCATE(temptsfile(nbreg))
+    CALL read_tempts(nout,temptsfile,tslength)
+
+    !   IF (boolfix) then
+  !   nb_temp_fix = nb_temp_fix + 1
+  !   ALLOCATE(reg_temp_fix(nb_temp_fix))
+  !   reg_temp_fix(nb_temp_fix)=reg_temp_fix1
+  !  ! STOP
+  !   ENDIF
+   !ENDIF
 ELSE
 
   WRITE(*,*) ' Temperature parameters not found'
@@ -5411,7 +5445,39 @@ ELSE IF (jtemp == 1) THEN                         !! Temperature gradient in X d
       END DO
     END DO
   END DO
+ELSEIF (jtemp == 3) THEN !! Temperature time series allocated to specific regions
 
+  CALL read_tempregion(nout,nx,ny,nz,len(TFile),TFile,TemperatureFileFormat)
+  !!dummy1=temp_region
+  
+  !Allocate fixed temperature to the regions:
+              DO jz = 1,nz
+              DO jy = 1,ny
+              DO jx = 1,nx
+              DO i = 1,nb_temp_fix
+                  IF (temp_region(jx,jy,jz) == reg_temp_fix(i)) THEN
+                    t(jx,jy,jz) = temp_fix(i)
+                  ENDIF
+              END DO
+              END DO
+              END DO
+              END DO
+              
+  IF (RunTempts) THEN
+    DO jz = 1,nz
+      DO jy = 1,ny
+      DO jx = 1,nx
+      DO i = 1,nb_temp_ts
+          IF (temp_region(jx,jy,jz) == reg_temp_ts(i)) THEN
+            t(jx,jy,jz) = temp_ts(i,1)
+          ENDIF
+      END DO
+      END DO
+      END DO
+      END DO
+  
+  ENDIF
+  dummy1=t
 ELSE
 
   DO jz = 1,nz
@@ -5421,7 +5487,6 @@ ELSE
       END DO
     END DO
   END DO
-
 END IF
 
 DO jz = 1,nz

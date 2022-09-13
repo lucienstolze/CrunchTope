@@ -842,6 +842,11 @@ IF (ALLOCATED(d_sp)) THEN
 ELSE
   ALLOCATE(d_sp(ncomp+nspec))
 END IF
-
+IF (ALLOCATED(actenergyaq)) THEN
+  DEALLOCATE(actenergyaq)
+  ALLOCATE(actenergyaq(nreactkinmax,ikin))
+ELSE
+  ALLOCATE(actenergyaq(nreactkinmax,ikin))
+END IF
 
 END SUBROUTINE GlobalArrayAllocation
