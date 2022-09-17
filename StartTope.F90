@@ -8937,8 +8937,10 @@ IF (found) THEN
       IF (depth(jy)-wattab_ts(1)<=0) THEN
       pres(0,jy-1,1) = 0
       permx(0,jy-1,1) = 0
+      head(0,jy-1,1) = pres(0,jy-1,1) / (ro(0,jy-1,1) * 9.8d0)
       ELSEIF (jy >= depthwattab) THEN
       pres(0,jy-1,1) = (depth(jy)-wattab_ts(1))*9.81*1000
+      head(0,jy-1,1) = pres(0,jy-1,1) / (ro(0,jy-1,1) * 9.8d0)
       permx(0,jy-1,1) = permx(1,jy-1,1)
       !check3=check1(jy)-wattab_ts(1)
       ENDIF
