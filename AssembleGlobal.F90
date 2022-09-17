@@ -199,7 +199,10 @@ REAL(DP)        :: qgdum
 !! Time normalized used if time series only defined for 1 representative year:
 REAL(DP)        :: time_norm
 REAL(DP), DIMENSION(:), ALLOCATABLE                   :: temp_dum
-
+! transient water table 
+REAL(DP)                                                   :: wattab
+REAL(DP), DIMENSION(:), ALLOCATABLE                :: depth
+INTEGER(I4B)                 :: depthwattab
 !********************* PETSc declarations ********************************
 PetscFortranAddr                                                    user(6)
 Mat                                                                 amatpetsc
@@ -261,6 +264,32 @@ IF (pumptimeseries .AND. Richards) THEN
     ELSE
     CALL interp3(time,delt,tpump,qgt(:),qgdum,size(qgt(:)))
   END IF
+END IF
+
+IF (watertabletimeseries) THEN
+    
+
+  IF (TS_1year) THEN
+    time_norm=time-floor(time)
+    CALL interp3(time_norm,delt,wattab_t,wattab_ts(:),wattab,size(wattab_ts(:)))
+  ELSE
+    CALL interp3(time,delt,wattab_t,wattab_ts(:),wattab,size(wattab_ts(:)))
+  END IF
+
+  depth = y-dyy(1)/2!-wattab_ts(1)
+  depthwattab = minloc(abs(depth-wattab),1)
+
+  DO jy = 2,ny+1
+  IF (depth(jy)-wattab<=0) THEN
+  pres(0,jy-1,1) = 0
+  permx(0,jy-1,1) = 0
+  ELSEIF (jy >= depthwattab) THEN
+  pres(0,jy-1,1) = (depth(jy)-wattab)*9.81*1000
+  permx(0,jy-1,1) = permx(1,jy-1,1)
+  !check3=check1(jy)-wattab_ts(1)
+  ENDIF
+  ENDDO
+
 END IF
 
 IF (transpitimeseries .AND. Richards) THEN

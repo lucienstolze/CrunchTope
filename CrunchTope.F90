@@ -420,14 +420,16 @@ REAL(DP)                                                   :: watertable
 
 INTEGER(I4B)                                               :: i_substep
 
-! variables pump time series
-
+! transient pump time series
 REAL(DP)        :: time_norm
 REAL(DP)        :: qgdum
 REAL(DP)        :: time_dum
-
-! variables temperature time series
+! transient temperature 
 REAL(DP), DIMENSION(:), ALLOCATABLE                   :: temp_dum
+! transient water table 
+REAL(DP)                                                   :: wattab
+REAL(DP), DIMENSION(:), ALLOCATABLE                :: depth
+INTEGER(I4B)                 :: depthwattab
 ! ******************** PETSC declarations ********************************
 PetscFortranAddr     userC(6),userD(6),userP(6),user(6)
 Mat                  amatpetsc,amatD,amatP
@@ -603,20 +605,28 @@ IF (CalculateFlow) THEN
 
   IF (watertabletimeseries) THEN
     
-    jz=1
-    jx=0
-    DO jy = 1,ny
-      IF (TS_1year) THEN
-        time_norm=time-floor(time)
-        CALL interp3(time_norm,delt,twatertable,pressurebct(:,jx,jy,jz),pres(jx,jy,jz),size(pressurebct(:,jx,jy,jz)))
-      ELSE
-        CALL interp3(time,delt,twatertable,pressurebct(:,jx,jy,jz),pres(jx,jy,jz),size(pressurebct(:,jx,jy,jz)))
-      END IF
-      if (pres(jx,jy,jz)==0) then
-        permx(jx,jy,jz)=0
-      end if
-    END DO
-    
+
+    IF (TS_1year) THEN
+      time_norm=time-floor(time)
+      CALL interp3(time_norm,delt,wattab_t,wattab_ts(:),wattab,size(wattab_ts(:)))
+    ELSE
+      CALL interp3(time,delt,wattab_t,wattab_ts(:),wattab,size(wattab_ts(:)))
+    END IF
+  
+    depth = y-dyy(1)/2!-wattab_ts(1)
+    depthwattab = minloc(abs(depth-wattab),1)
+  
+    DO jy = 2,ny+1
+    IF (depth(jy)-wattab<=0) THEN
+    pres(0,jy-1,1) = 0
+    permx(0,jy-1,1) = 0
+    ELSEIF (jy >= depthwattab) THEN
+    pres(0,jy-1,1) = (depth(jy)-wattab)*9.81*1000
+    permx(0,jy-1,1) = permx(1,jy-1,1)
+    !check3=check1(jy)-wattab_ts(1)
+    ENDIF
+    ENDDO
+  
   END IF
 
   IF (pumptimeseries) THEN
@@ -671,6 +681,10 @@ IF (CalculateFlow) THEN
         END DO
         END DO
         END DO
+  
+  if (time>1) then
+    STOP
+  ENDIF
   ENDIF
 
  

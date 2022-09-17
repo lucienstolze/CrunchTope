@@ -198,9 +198,9 @@ LOGICAL(LGT)                                   :: TS_1year
 !! Boundary open in single direction only Lucien Stolze 20211108
 LOGICAL(LGT)                                   :: back_flow_closed
 !! Dynamic water table Lucien Stolze 20211201
-REAL(DP), DIMENSION(:,:,:,:), ALLOCATABLE      :: pressurebct
-REAL(DP), DIMENSION(:), ALLOCATABLE             :: twatertable
-LOGICAL(LGT)                                   :: watertabletimeseries
+REAL(DP), DIMENSION(:), ALLOCATABLE             :: wattab_ts
+REAL(DP), DIMENSION(:), ALLOCATABLE             :: wattab_t
+LOGICAL(LGT)                                    :: watertabletimeseries
 !! Disable mineralupdate during model spinup
 LOGICAL(LGT)                                   :: spinup ! Lucien Stolze 20220731
 !!Evapotranspiration timeseries

@@ -627,14 +627,11 @@ CHARACTER (LEN=mls)                          :: PumptimeseriesFileFormat
 CHARACTER (LEN=mls)                          :: pumplocationsfile
 CHARACTER (LEN=mls)                          :: PumplocationsFileFormat
 INTEGER(I4B)                                                  :: lfile2
-CHARACTER (LEN=mls)                          :: watertablefile
-CHARACTER (LEN=mls)                          :: WatertableFileFormat
 CHARACTER (LEN=mls)                          :: evapofile
 CHARACTER (LEN=mls)                          :: transpifile
 INTEGER(I4B)                                                  :: tslength
 REAL(DP), DIMENSION(:), ALLOCATABLE      :: realmult_dum
 
-REAL(DP), DIMENSION(:,:,:), ALLOCATABLE      :: check3
 REAL(DP), DIMENSION(:,:,:), ALLOCATABLE      :: dummy1
 CHARACTER (LEN=mls)                                           :: SnapshotFileFormat
 
@@ -645,6 +642,10 @@ REAL(DP)                                                    :: temp_fix1
 LOGICAL(LGT)                                :: boolfix
 LOGICAL(LGT)                                :: boolreg
 integer :: IERR = 0
+REAL(DP), DIMENSION(:), ALLOCATABLE                :: depth
+INTEGER(I4B)                 :: depthwattab
+!REAL(DP)              :: check3
+!REAL(DP), DIMENSION(:), ALLOCATABLE              :: check4
 
 #if defined(ALQUIMIA)
 
@@ -4362,7 +4363,6 @@ IF (found) THEN
    dxxt = dxxt/dist_scale
    dyyt = dyyt/dist_scale
    dzzt = dzzt/dist_scale
-
    dist_scale = 1.0d0
 
 !!! ExportGridLocations  true
@@ -8926,15 +8926,26 @@ IF (found) THEN
 
 
       watertabletimeseries = .FALSE.
-      CALL read_watertablefile(nout,nx,ny,nz,watertablefile,lfile,watertabletimeseries,WatertableFileFormat)
+      CALL  read_watertable_timeseries(nout)
+
       IF (watertabletimeseries) THEN
-      CALL  read_watertable_timeseries(nout,nx,ny,nz,lfile,watertablefile,WatertableFileFormat)
-      !!else
-      !!  CALL read_pump(nout,nx,ny,nz,nchem)
+      
+      depth = y-dyy(1)/2!-wattab_ts(1)
+      depthwattab = minloc(abs(depth-wattab_ts(1)),1)
+
+      DO jy = 2,ny+1
+      IF (depth(jy)-wattab_ts(1)<=0) THEN
+      pres(0,jy-1,1) = 0
+      permx(0,jy-1,1) = 0
+      ELSEIF (jy >= depthwattab) THEN
+      pres(0,jy-1,1) = (depth(jy)-wattab_ts(1))*9.81*1000
+      permx(0,jy-1,1) = permx(1,jy-1,1)
+      !check3=check1(jy)-wattab_ts(1)
       ENDIF
-
-      check3=pres
-
+      ENDDO
+      ENDIF
+      !check4=pres(0,:,1)
+      
       parchar = 'initialize_hydrostatic'
       parfind = ' '
       InitializeHydrostatic = .FALSE.
