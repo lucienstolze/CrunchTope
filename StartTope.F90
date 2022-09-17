@@ -8934,6 +8934,7 @@ IF (found) THEN
       depthwattab = minloc(abs(depth-wattab_ts(1)),1)
 
       DO jy = 2,ny+1
+      activecellPressure(0,jy-1,1) = 0
       IF (depth(jy)-wattab_ts(1)<=0) THEN
       pres(0,jy-1,1) = 0
       permx(0,jy-1,1) = 0
