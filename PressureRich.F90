@@ -357,7 +357,7 @@ DO jz = 1,nz
                     END IF
 
                     IF (evapofix .OR. evapotimeseries) THEN
-                        pumpterm = pumpterm + visc*ro(jx,jy,jz)*evapoflux(jx,jy,jz)/(secyr*dxx(jx)*dyy(jy)*dzz(jx,jy,jz))
+                        !pumpterm = pumpterm + visc*ro(jx,jy,jz)*evapoflux(jx,jy,jz)/(secyr*dxx(jx)*dyy(jy)*dzz(jx,jy,jz))
                         pumpterm = pumpterm + dt * evapoflux(jx,jy,jz)/(secyr*dxx(jx)*dyy(jy)*dzz(x,jy,jz))
                     END IF
 
