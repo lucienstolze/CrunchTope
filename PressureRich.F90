@@ -344,18 +344,21 @@ DO jz = 1,nz
                     ELSEIF (pumpterm1 < 0.0d0 .AND. (wc(jx,jy,jz)-wcr(jx,jy,jz)-1e-3) + pumpterm1 <=0) then
                         pumpterm1 = (wc(jx,jy,jz)-wcr(jx,jy,jz)-1e-3)
                     ENDIF
-                        pumpterm = visc*ro(jx,jy,jz)*pumpterm1/dt
+                        !pumpterm = visc*ro(jx,jy,jz)*pumpterm1/dt
+                        pumpterm = pumpterm1
                     !   DO npz = 1,npump(jx,jy,jz)
                     !     pumpterm = pumpterm + visc*ro(jx,jy,jz)*qg(npz,jx,jy,jz)/(secyr*dxx(jx)*dyy(jy)*dzz(jx,jy,jz))
                     !   END DO
                     END IF
 
                     IF (transpifix .OR. transpitimeseries) THEN
-                          pumpterm = pumpterm + visc*ro(jx,jy,jz)*transpiflux(jx,jy,jz)/(secyr*dxx(jx)*dyy(jy)*dzz(jx,jy,jz))
+                          !pumpterm = pumpterm + visc*ro(jx,jy,jz)*transpiflux(jx,jy,jz)/(secyr*dxx(jx)*dyy(jy)*dzz(jx,jy,jz))
+                          pumpterm = pumpterm + dt * transpiflux(jx,jy,jz)/(secyr*dxx(jx)*dyy(jy)*dzz(x,jy,jz))
                     END IF
 
                     IF (evapofix .OR. evapotimeseries) THEN
                         pumpterm = pumpterm + visc*ro(jx,jy,jz)*evapoflux(jx,jy,jz)/(secyr*dxx(jx)*dyy(jy)*dzz(jx,jy,jz))
+                        pumpterm = pumpterm + dt * evapoflux(jx,jy,jz)/(secyr*dxx(jx)*dyy(jy)*dzz(x,jy,jz))
                     END IF
 
                     BvecCrunchP(j) = BvecCrunchP(j) + pumpterm
