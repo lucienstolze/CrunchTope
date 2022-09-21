@@ -353,12 +353,12 @@ DO jz = 1,nz
 
                     IF (transpifix .OR. transpitimeseries) THEN
                           !pumpterm = pumpterm + visc*ro(jx,jy,jz)*transpiflux(jx,jy,jz)/(secyr*dxx(jx)*dyy(jy)*dzz(jx,jy,jz))
-                          pumpterm = pumpterm + dt * transpiflux(jx,jy,jz)/(secyr*dxx(jx)*dyy(jy)*dzz(x,jy,jz))
+                          pumpterm = pumpterm + dt * transpiflux(jx,jy,jz)/(secyr*dxx(jx)*dyy(jy)*dzz(jx,jy,jz))
                     END IF
 
                     IF (evapofix .OR. evapotimeseries) THEN
                         !pumpterm = pumpterm + visc*ro(jx,jy,jz)*evapoflux(jx,jy,jz)/(secyr*dxx(jx)*dyy(jy)*dzz(jx,jy,jz))
-                        pumpterm = pumpterm + dt * evapoflux(jx,jy,jz)/(secyr*dxx(jx)*dyy(jy)*dzz(x,jy,jz))
+                        pumpterm = pumpterm + dt * evapoflux(jx,jy,jz)/(secyr*dxx(jx)*dyy(jy)*dzz(jx,jy,jz))
                     END IF
 
                     BvecCrunchP(j) = BvecCrunchP(j) + pumpterm
