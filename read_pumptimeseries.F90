@@ -186,7 +186,7 @@ IF(ls /= 0) THEN
             READ(23,*,END=1020) tpump(tp),qgt(tp)
             qgt(tp)=((qgt(tp))/1000.0d0)*dxx(nx)*dzz(1,1,1) !! Converting from mm/year to m3/year
           END DO
-            qg(1,nx,ny,nz)=qgt(1)
+            !qg(1,nx,ny,nz)=qgt(1)
 
     CLOSE(UNIT=23,STATUS='keep')
   
