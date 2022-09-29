@@ -622,11 +622,11 @@ INTEGER(I4B)                                                  :: nvgn
 INTEGER(I4B)                                                  :: nvga
 INTEGER(I4B)                                                  :: nwcr
 
-CHARACTER (LEN=mls)                          :: pumptimeseriesfile
-CHARACTER (LEN=mls)                          :: PumptimeseriesFileFormat
-CHARACTER (LEN=mls)                          :: pumplocationsfile
-CHARACTER (LEN=mls)                          :: PumplocationsFileFormat
-INTEGER(I4B)                                                  :: lfile2
+!CHARACTER (LEN=mls)                          :: pumptimeseriesfile
+!CHARACTER (LEN=mls)                          :: PumptimeseriesFileFormat
+!CHARACTER (LEN=mls)                          :: pumplocationsfile
+!CHARACTER (LEN=mls)                          :: PumplocationsFileFormat
+!INTEGER(I4B)                                                  :: lfile2
 CHARACTER (LEN=mls)                          :: evapofile
 CHARACTER (LEN=mls)                          :: transpifile
 INTEGER(I4B)                                                  :: tslength
@@ -7710,13 +7710,17 @@ IF (found) THEN
 
     pumptimeseries = .FALSE.
 
-    CALL read_pumptimeseriesfile(nout,nx,ny,nz,pumptimeseriesfile,lfile,pumptimeseries,PumptimeseriesFileFormat)
-    CALL read_pumplocationsfile(nout,nx,ny,nz,pumplocationsfile,lfile2,PumplocationsFileFormat)
+    ! CALL read_pumptimeseriesfile(nout,nx,ny,nz,pumptimeseriesfile,lfile,pumptimeseries,PumptimeseriesFileFormat)
+    ! CALL read_pumplocationsfile(nout,nx,ny,nz,pumplocationsfile,lfile2,PumplocationsFileFormat)
+    ! IF (pumptimeseries) THEN
+
+    ! CALL  read_pump_timeseries2(nout,nx,ny,nz,nchem,lfile,pumptimeseriesfile,PumptimeseriesFileFormat,lfile2,pumplocationsfile,PumplocationsFileFormat)
+
+    CALL read_pumptimeseries(nout,nx,ny,nz)
     IF (pumptimeseries) THEN
+    CALL read_pumplocations(nout,nx,ny,nz,nchem)
 
-    CALL  read_pump_timeseries2(nout,nx,ny,nz,nchem,lfile,pumptimeseriesfile,PumptimeseriesFileFormat,lfile2,pumplocationsfile,PumplocationsFileFormat)
-
-    else
+    ELSE
       CALL read_pump(nout,nx,ny,nz,nchem)
     ENDIF
 
