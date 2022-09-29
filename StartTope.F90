@@ -646,7 +646,6 @@ REAL(DP), DIMENSION(:), ALLOCATABLE                :: depth
 INTEGER(I4B)                 :: depthwattab
 !REAL(DP)              :: check3
 !REAL(DP), DIMENSION(:), ALLOCATABLE              :: check4
-REAL(DP), DIMENSION(:), ALLOCATABLE          :: qgt_dum
 
 #if defined(ALQUIMIA)
 
@@ -7722,8 +7721,6 @@ IF (found) THEN
     IF (pumptimeseries) THEN
 
     CALL read_pumplocations(nout,nx,ny,nz,nchem)
-    qgt_dum=qgt
-    STOP
     ELSE
       CALL read_pump(nout,nx,ny,nz,nchem)
     ENDIF
