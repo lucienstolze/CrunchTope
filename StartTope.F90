@@ -9099,7 +9099,7 @@ IF (found) THEN
                 END DO
               END DO
         !!STOP
-         else
+            endif
       pres = PressureZone(0)
 
 !  Next, initialize pressure from various zones
@@ -9124,7 +9124,7 @@ IF (found) THEN
       DEALLOCATE(jyyPressure_hi)
       DEALLOCATE(jzzPressure_lo)
       DEALLOCATE(jzzPressure_hi)
-      endif
+      !!endif
 
 
       watertabletimeseries = .FALSE.
