@@ -312,6 +312,7 @@ CHARACTER (LEN=mls)                                           :: permfile
 CHARACTER (LEN=mls)                                           :: vgnfile
 CHARACTER (LEN=mls)                                           :: vgafile
 CHARACTER (LEN=mls)                                           :: wcrfile
+CHARACTER (LEN=mls)                                           :: actpressurefile
 CHARACTER (LEN=mls)                                           :: breakfile
 CHARACTER (LEN=mls)                                           :: namtemp
 CHARACTER (LEN=12)                                            :: writeph
@@ -339,6 +340,9 @@ LOGICAL(LGT)                                                  :: readperm
 LOGICAL(LGT)                                                  :: readvgn
 LOGICAL(LGT)                                                  :: readvga
 LOGICAL(LGT)                                                  :: readwcr
+LOGICAL(LGT)                                                  :: readpermx
+LOGICAL(LGT)                                                  :: readpermy
+LOGICAL(LGT)                                                  :: readactpressure
 LOGICAL(LGT)                                                  :: onlyspeciate
 LOGICAL(LGT)                                                  :: genericrates
 LOGICAL(LGT)                                                  :: DaughterFound
@@ -393,6 +397,9 @@ CHARACTER (LEN=mls)                                           :: PermFileFormat
 CHARACTER (LEN=mls)                                           :: vgnFileFormat
 CHARACTER (LEN=mls)                                           :: vgaFileFormat
 CHARACTER (LEN=mls)                                           :: wcrFileFormat
+CHARACTER (LEN=mls)                                           :: permxFileFormat
+CHARACTER (LEN=mls)                                           :: permyFileFormat
+CHARACTER (LEN=mls)                                           :: actpressureFileFormat
 CHARACTER (LEN=mls)                                           :: VelocityFileFormat
 CHARACTER (LEN=mls)                                           :: TemperatureFileFormat
 CHARACTER (LEN=mls)                                           :: FileTemp
@@ -569,6 +576,7 @@ REAL(DP)                                                      :: SumMineralVolum
 
 REAL(DP)  :: dum1
 REAL(DP)  :: dum2
+INTEGER(I4B)  :: dum3
 REAL(DP)  :: PorosityRead
 REAL(DP)  :: QuartzRead
 REAL(DP)  :: ChloriteRead
@@ -8163,13 +8171,15 @@ IF (found) THEN
           OPEN(UNIT=23,FILE=vgnfile,STATUS='old',ERR=8001)
           FileTemp = vgnfile
           CALL stringlen(FileTemp,FileNameLength)
-              jz = 1
-              DO jy = 1,ny
-                DO jx= 1,nx
-                  READ(23,*,END=1020) xdum,ydum,vgn(jx,jy,jz)
+              !!jz = 
+              DO jy = 0,ny+1
+                DO jx= 0,nx+1
+                  READ(23,*,END=1020) xdum,ydum,dum1
+                  vgn(jx,jy,0:nz+1)=dum1
                 END DO
               END DO
-        
+        !!dummy1=vgn
+        !!STOP
          else
 
          IF (vgnzone(0) == 0.0) THEN
@@ -8229,9 +8239,10 @@ IF (found) THEN
           FileTemp = vgafile
           CALL stringlen(FileTemp,FileNameLength)
               jz = 1
-              DO jy = 1,ny
-                DO jx= 1,nx
-                  READ(23,*,END=1020) xdum,ydum,vga(jx,jy,jz)
+              DO jy = 0,ny+1
+                DO jx= 0,nx+1
+                  READ(23,*,END=1020) xdum,ydum,dum1
+                  vga(jx,jy,0:nz+1)=dum1
                 END DO
               END DO
         
@@ -8294,9 +8305,10 @@ IF (found) THEN
           FileTemp = wcrfile
           CALL stringlen(FileTemp,FileNameLength)
               jz = 1
-              DO jy = 1,ny
-                DO jx= 1,nx
-                  READ(23,*,END=1020) xdum,ydum,wcr(jx,jy,jz)
+              DO jy = 0,ny+1
+                DO jx= 0,nx+1
+                  READ(23,*,END=1020) xdum,ydum,dum1
+                  wcr(jx,jy,0:nz+1)=dum1
                 END DO
               END DO
         
@@ -8720,7 +8732,7 @@ IF (found) THEN
 
       END IF
 
-!!!!      ELSE
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         ALLOCATE(permzonex(0:mperm))
         ALLOCATE(permzoney(0:mperm))
@@ -8751,6 +8763,35 @@ IF (found) THEN
 
 
         CALL read_permx(nout,nx,ny,nz,npermx)
+        readpermx = .false.
+         CALL read_permxfile(nout,nx,ny,nz,permxfile,lfile,readpermx,permxFileFormat)
+
+         IF (readpermx) then
+
+          permxfile(1:lfile) = permxfile(1:lfile)
+          INQUIRE(FILE=permxfile,EXIST=ext)
+          IF (.NOT. ext) THEN
+            WRITE(*,*)
+            WRITE(*,*) ' permx file not found: ',permxfile(1:lfile)
+            WRITE(*,*)
+            READ(*,*)
+            STOP
+          END IF
+          OPEN(UNIT=23,FILE=permxfile,STATUS='old',ERR=8001)
+          FileTemp = permxfile
+          CALL stringlen(FileTemp,FileNameLength)
+              jz = 1
+              DO jy = 1,ny
+                DO jx= 0,nx+1
+                  READ(23,*,END=1020) xdum,ydum,dum1
+                  if (dum1<-20) then
+                 permx(jx,jy,1:nz)=0
+                  else
+                  permx(jx,jy,1:nz)=10**dum1
+                  endif
+                END DO
+              END DO
+        else
         IF (permzonex(0) == 0.0 .and. .NOT. ReadPerm) THEN
           WRITE(*,*)
           WRITE(*,*) ' No default X permeability given'
@@ -8797,6 +8838,10 @@ IF (found) THEN
         DEALLOCATE(jzzpermx_lo)
         DEALLOCATE(jzzpermx_hi)
 
+
+      endif
+
+
         IF (ny == 1) THEN
           permy = 0.0
           perminy = 0.0
@@ -8808,6 +8853,38 @@ IF (found) THEN
           DEALLOCATE(jzzpermy_lo)
           DEALLOCATE(jzzpermy_hi)
         ELSE
+
+
+          readpermy = .false.
+          CALL read_permyfile(nout,nx,ny,nz,permyfile,lfile,readpermy,permyFileFormat)
+ 
+          IF (readpermy) then
+ 
+           permyfile(1:lfile) = permyfile(1:lfile)
+           INQUIRE(FILE=permyfile,EXIST=ext)
+           IF (.NOT. ext) THEN
+             WRITE(*,*)
+             WRITE(*,*) ' permy file not found: ',permyfile(1:lfile)
+             WRITE(*,*)
+             READ(*,*)
+             STOP
+           END IF
+           OPEN(UNIT=23,FILE=permyfile,STATUS='old',ERR=8001)
+           FileTemp = permyfile
+           CALL stringlen(FileTemp,FileNameLength)
+               jz = 1
+               DO jy = 0,ny+1
+                 DO jx= 1,nx
+                   READ(23,*,END=1020) xdum,ydum,dum1
+                   if (dum1<-20) then
+                  permy(jx,jy,1:nz)=0
+                   else
+                   permy(jx,jy,1:nz)=10**dum1
+                   endif
+                 END DO
+               END DO
+         else
+
           CALL read_permy(nout,nx,ny,nz,npermy)
           IF (permzoney(0) == 0.0 .and. .NOT.ReadPerm) THEN
             WRITE(*,*)
@@ -8858,8 +8935,11 @@ IF (found) THEN
           DEALLOCATE(jyypermy_hi)
           DEALLOCATE(jzzpermy_lo)
           DEALLOCATE(jzzpermy_hi)
-
+        endif
         END IF
+
+
+
 
         IF (nz == 1) THEN
 
@@ -8994,6 +9074,32 @@ IF (found) THEN
 
       CALL read_pressureAlternative(nout,nx,ny,nz,npressure)
 
+        readactpressure = .false.
+         CALL read_actpressurefile(nout,nx,ny,nz,actpressurefile,lfile,readactpressure,actpressureFileFormat)
+
+         IF (readactpressure) then
+
+          actpressurefile(1:lfile) = actpressurefile(1:lfile)
+          INQUIRE(FILE=actpressurefile,EXIST=ext)
+          IF (.NOT. ext) THEN
+            WRITE(*,*)
+            WRITE(*,*) ' actpressure file not found: ',actpressurefile(1:lfile)
+            WRITE(*,*)
+            READ(*,*)
+            STOP
+          END IF
+          OPEN(UNIT=23,FILE=actpressurefile,STATUS='old',ERR=8001)
+          FileTemp = actpressurefile
+          CALL stringlen(FileTemp,FileNameLength)
+              jz = 1
+              DO jy = 0,ny+1
+                DO jx= 0,nx+1
+                  READ(23,*,END=1020) xdum,ydum,dum1
+                  activecellPressure(jx,jy,1:nz+1)=dum1
+                END DO
+              END DO
+        !!STOP
+         else
       pres = PressureZone(0)
 
 !  Next, initialize pressure from various zones
@@ -9018,7 +9124,7 @@ IF (found) THEN
       DEALLOCATE(jyyPressure_hi)
       DEALLOCATE(jzzPressure_lo)
       DEALLOCATE(jzzPressure_hi)
-
+      endif
 
 
       watertabletimeseries = .FALSE.

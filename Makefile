@@ -348,6 +348,9 @@ SOURCEF = \
           read_vgnfile.F90\
           read_vgafile.F90\
           read_wcrfile.F90\
+          read_permxfile.F90\
+          read_permyfile.F90\
+          read_actpressurefile.F90\
 
 
 OBJSF  =  crunchtype.o\
@@ -695,6 +698,9 @@ OBJSF  =  crunchtype.o\
           read_vgnfile.o\
           read_vgafile.o\
           read_wcrfile.o\
+          read_permxfile.o\
+          read_permyfile.o\
+          read_actpressurefile.o\
 
 LOCDIR   = ${CrunchTope_Dir}
 
