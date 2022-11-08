@@ -309,6 +309,9 @@ CHARACTER (LEN=mls)                                           :: velocityfile
 CHARACTER (LEN=mls)                                           :: TortuosityFile
 CHARACTER (LEN=mls)                                           :: gasvelocityfile
 CHARACTER (LEN=mls)                                           :: permfile
+CHARACTER (LEN=mls)                                           :: vgnfile
+CHARACTER (LEN=mls)                                           :: vgafile
+CHARACTER (LEN=mls)                                           :: wcrfile
 CHARACTER (LEN=mls)                                           :: breakfile
 CHARACTER (LEN=mls)                                           :: namtemp
 CHARACTER (LEN=12)                                            :: writeph
@@ -333,6 +336,9 @@ LOGICAL(LGT)                                                  :: constant_gasflo
 LOGICAL(LGT)                                                  :: readvelocity
 LOGICAL(LGT)                                                  :: readgasvelocity
 LOGICAL(LGT)                                                  :: readperm
+LOGICAL(LGT)                                                  :: readvgn
+LOGICAL(LGT)                                                  :: readvga
+LOGICAL(LGT)                                                  :: readwcr
 LOGICAL(LGT)                                                  :: onlyspeciate
 LOGICAL(LGT)                                                  :: genericrates
 LOGICAL(LGT)                                                  :: DaughterFound
@@ -384,6 +390,9 @@ CHARACTER (LEN=mls)                                  :: BurialFileFormat
 CHARACTER (LEN=mls)                                           :: TortuosityFileFormat
 CHARACTER (LEN=mls)                                           :: GasVelocityFileFormat
 CHARACTER (LEN=mls)                                           :: PermFileFormat
+CHARACTER (LEN=mls)                                           :: vgnFileFormat
+CHARACTER (LEN=mls)                                           :: vgaFileFormat
+CHARACTER (LEN=mls)                                           :: wcrFileFormat
 CHARACTER (LEN=mls)                                           :: VelocityFileFormat
 CHARACTER (LEN=mls)                                           :: TemperatureFileFormat
 CHARACTER (LEN=mls)                                           :: FileTemp
@@ -8137,6 +8146,32 @@ IF (found) THEN
 
          ! read van Genuchten n
          CALL read_vgn(nout,nx,ny,nz,nvgn)
+         readvgn = .false.
+         CALL read_vgnfile(nout,nx,ny,nz,vgnfile,lfile,readvgn,vgnFileFormat)
+
+         IF (readvgn) then
+
+          vgnfile(1:lfile) = vgnfile(1:lfile)
+          INQUIRE(FILE=vgnfile,EXIST=ext)
+          IF (.NOT. ext) THEN
+            WRITE(*,*)
+            WRITE(*,*) ' vgn file not found: ',vgnfile(1:lfile)
+            WRITE(*,*)
+            READ(*,*)
+            STOP
+          END IF
+          OPEN(UNIT=23,FILE=vgnfile,STATUS='old',ERR=8001)
+          FileTemp = vgnfile
+          CALL stringlen(FileTemp,FileNameLength)
+              jz = 1
+              DO jy = 1,ny
+                DO jx= 1,nx
+                  READ(23,*,END=1020) xdum,ydum,vgn(jx,jy,jz)
+                END DO
+              END DO
+        
+         else
+
          IF (vgnzone(0) == 0.0) THEN
            WRITE(*,*)
            WRITE(*,*) ' No default vangenuchten_n given'
@@ -8171,9 +8206,37 @@ IF (found) THEN
          DEALLOCATE(jyyvgn_hi)
          DEALLOCATE(jzzvgn_lo)
          DEALLOCATE(jzzvgn_hi)
+        endif
+
 
          ! read van Genuchten alpha
          CALL read_vga(nout,nx,ny,nz,nvga)
+         readvga = .false.
+         CALL read_vgafile(nout,nx,ny,nz,vgafile,lfile,readvga,vgaFileFormat)
+
+         IF (readvga) then
+
+          vgafile(1:lfile) = vgafile(1:lfile)
+          INQUIRE(FILE=vgafile,EXIST=ext)
+          IF (.NOT. ext) THEN
+            WRITE(*,*)
+            WRITE(*,*) ' vga file not found: ',vgafile(1:lfile)
+            WRITE(*,*)
+            READ(*,*)
+            STOP
+          END IF
+          OPEN(UNIT=23,FILE=vgafile,STATUS='old',ERR=8001)
+          FileTemp = vgafile
+          CALL stringlen(FileTemp,FileNameLength)
+              jz = 1
+              DO jy = 1,ny
+                DO jx= 1,nx
+                  READ(23,*,END=1020) xdum,ydum,vga(jx,jy,jz)
+                END DO
+              END DO
+        
+         else
+
          IF (vgazone(0) == 0.0) THEN
            WRITE(*,*)
            WRITE(*,*) ' No default vangenuchten_alpha given'
@@ -8208,9 +8271,37 @@ IF (found) THEN
          DEALLOCATE(jyyvga_hi)
          DEALLOCATE(jzzvga_lo)
          DEALLOCATE(jzzvga_hi)
+        endif
 
          ! read residual water content
          CALL read_wcr(nout,nx,ny,nz,nwcr)
+
+         readwcr = .false.
+         CALL read_wcrfile(nout,nx,ny,nz,wcrfile,lfile,readwcr,wcrFileFormat)
+
+         IF (readwcr) then
+
+          wcrfile(1:lfile) = wcrfile(1:lfile)
+          INQUIRE(FILE=wcrfile,EXIST=ext)
+          IF (.NOT. ext) THEN
+            WRITE(*,*)
+            WRITE(*,*) ' wcr file not found: ',wcrfile(1:lfile)
+            WRITE(*,*)
+            READ(*,*)
+            STOP
+          END IF
+          OPEN(UNIT=23,FILE=wcrfile,STATUS='old',ERR=8001)
+          FileTemp = wcrfile
+          CALL stringlen(FileTemp,FileNameLength)
+              jz = 1
+              DO jy = 1,ny
+                DO jx= 1,nx
+                  READ(23,*,END=1020) xdum,ydum,wcr(jx,jy,jz)
+                END DO
+              END DO
+        
+         else
+
          IF (wcrzone(0) == 0.0) THEN
            WRITE(*,*)
            WRITE(*,*) ' No default wc_residual given'
@@ -8245,9 +8336,9 @@ IF (found) THEN
          DEALLOCATE(jyywcr_hi)
          DEALLOCATE(jzzwcr_lo)
          DEALLOCATE(jzzwcr_hi)
-
+        endif
      END IF
-
+    
 !  Look for information on permeability, pressure, and pumping or injection wells
 !  First, check to see whether permeability distribution is to be read from file
 

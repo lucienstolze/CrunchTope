@@ -345,6 +345,9 @@ SOURCEF = \
           read_pumptimeseries.F90\
           read_pumplocations.F90\
           FRACTUREAPERTURE.F90\
+          read_vgnfile.F90\
+          read_vgafile.F90\
+          read_wcrfile.F90\
 
 
 OBJSF  =  crunchtype.o\
@@ -689,6 +692,9 @@ OBJSF  =  crunchtype.o\
           read_pumptimeseries.o\
           read_pumplocations.o\
           FRACTUREAPERTURE.o\
+          read_vgnfile.o\
+          read_vgafile.o\
+          read_wcrfile.o\
 
 LOCDIR   = ${CrunchTope_Dir}
 
