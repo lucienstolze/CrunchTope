@@ -54,6 +54,9 @@ MODULE  concentration
   
   CHARACTER (LEN=mls)                               :: InitialConditionsFile
   
+  LOGICAL(LGT)                                      :: ReadActiveCells
+  
+  CHARACTER (LEN=mls)                               :: ActiveCellsFile
 
   INTEGER(I4B)                                      :: ikh2o  !  integer pointer for species number for H2O
   INTEGER(I4B)                                      :: nplot  !  number of time series plot files

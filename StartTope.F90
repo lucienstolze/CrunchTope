@@ -5087,7 +5087,7 @@ CALL read_het(nout,nchem,nhet,nx,ny,nz)
 
 IF (ReadInitialConditions .and. InitialConditionsFile /= ' ') THEN
 
-  ALLOCATE(work3(nx,ny,nz))
+  !!ALLOCATE(work3(nx,ny,nz))
   INQUIRE(FILE=InitialConditionsFile,EXIST=ext)
   IF (.NOT. ext) THEN
     CALL stringlen(InitialConditionsFile,ls)
@@ -5102,7 +5102,6 @@ IF (ReadInitialConditions .and. InitialConditionsFile /= ' ') THEN
   FileTemp = InitialConditionsFile
   CALL stringlen(FileTemp,FileNameLength)
   
-  IF (MontTerri) THEN
 
     nhet = 0
     DO jz = 1,nz
@@ -5110,56 +5109,57 @@ IF (ReadInitialConditions .and. InitialConditionsFile /= ' ') THEN
         DO jx= 1,nx
           
           nhet = nhet + 1
-          READ(52,*,END=1020) xdum,ydum,zdum, work3(jx,jy,jz)
+          READ(52,*,END=1020) xdum,ydum, dum1
 !!!                            x    y    z    condition #             
-          jinit(jx,jy,jz) = work3(jx,jy,jz) 
-          activecell(jx,jy,jz) = 1
+          jinit(jx,jy,jz) = dum1
+          
 
         END DO
       END DO
     END DO
 
     CLOSE(UNIT=52)
+  
 
-  END IF
+    CALL read_activecellfile(nout)
 
-  if (nmmLogical) then
+  
 
-    jz = 1
-    ALLOCATE(stress(nx,ny,1))
+    IF (ReadActiveCells .and. ActiveCellsFile /= ' ') THEN
 
-    nhet = 0
-    DO jy = 1,ny
-      DO jx= 1,nx
-        nhet = nhet + 1
-        IF (SaltCreep) THEN
-          READ(52,*,END=1020) xdum,ydum,zdum, work3(jx,jy,jz), xdum, ydum, zdum, xdum, ydum, xdum, stress(jx,jy,jz), zdum,   xdum
-!!!                            x    y    bn    mt               sx    sy    txy   dx    dy    sig1  sig3              re-sig1 re-sig
-
-          jinit(jx,jy,jz) = DNINT(work3(jx,jy,jz)) + 1
-
-        ELSE IF (FractureNetwork) THEN
-
-          READ(52,*,END=1020) xdum,ydum,zdum, work3(jx,jy,jz)
-!!!                            x    y    bn    mt
-
-          jinit(jx,jy,jz) = DNINT(work3(jx,jy,jz))
-
-        ELSE
-          CONTINUE
-        ENDIF
-        activecell(jx,jy,jz) = 1
-      END DO
-    END DO
-
-    CLOSE(UNIT=52)
+      !!ALLOCATE(activecell(nx,ny,nz))
+      INQUIRE(FILE=InitialConditionsFile,EXIST=ext)
+      IF (.NOT. ext) THEN
+        CALL stringlen(InitialConditionsFile,ls)
+        WRITE(*,*)
+        WRITE(*,*) ' InitialConditionsFile not found: ', InitialConditionsFile(1:ls)
+        WRITE(*,*)
+        READ(*,*)
+        STOP
+      END IF
+      
+      OPEN(UNIT=52,FILE=InitialConditionsFile,STATUS='OLD',ERR=6001)
+      FileTemp = InitialConditionsFile
+      CALL stringlen(FileTemp,FileNameLength)
+      
     
-    StressMaxVal= MaxVal(ABS(stress*1.0E-06))
-    write(*,*)
-    write(*,*) ' StressMaxVal =', StressMaxVal
-    write(*,*)
+        DO jz = 1,nz
+          DO jy = 1,ny
+            DO jx= 1,nx
+              
+              READ(52,*,END=1020) xdum,ydum, dum1
+    !!!                            x    y    z    condition #             
+              activecell(jx,jy,jz) = dum1
+              
+    
+            END DO
+          END DO
+        END DO
+    
+        CLOSE(UNIT=52)
 
-  END IF
+
+END IF
 
 END IF
 

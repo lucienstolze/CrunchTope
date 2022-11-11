@@ -351,6 +351,7 @@ SOURCEF = \
           read_permxfile.F90\
           read_permyfile.F90\
           read_actpressurefile.F90\
+          read_activecellfile.F90\
 
 
 OBJSF  =  crunchtype.o\
@@ -701,6 +702,7 @@ OBJSF  =  crunchtype.o\
           read_permxfile.o\
           read_permyfile.o\
           read_actpressurefile.o\
+          read_activecellfile.o\
 
 LOCDIR   = ${CrunchTope_Dir}
 
