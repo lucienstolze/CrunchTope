@@ -5128,18 +5128,18 @@ IF (ReadInitialConditions .and. InitialConditionsFile /= ' ') THEN
     IF (ReadActiveCells .and. ActiveCellsFile /= ' ') THEN
 
       !!ALLOCATE(activecell(nx,ny,nz))
-      INQUIRE(FILE=InitialConditionsFile,EXIST=ext)
+      INQUIRE(FILE=ActiveCellsFile,EXIST=ext)
       IF (.NOT. ext) THEN
-        CALL stringlen(InitialConditionsFile,ls)
+        CALL stringlen(ActiveCellsFile,ls)
         WRITE(*,*)
-        WRITE(*,*) ' InitialConditionsFile not found: ', InitialConditionsFile(1:ls)
+        WRITE(*,*) ' ActiveCellsFile not found: ', ActiveCellsFile(1:ls)
         WRITE(*,*)
         READ(*,*)
         STOP
       END IF
       
-      OPEN(UNIT=52,FILE=InitialConditionsFile,STATUS='OLD',ERR=6001)
-      FileTemp = InitialConditionsFile
+      OPEN(UNIT=52,FILE=ActiveCellsFile,STATUS='OLD',ERR=6001)
+      FileTemp = ActiveCellsFile
       CALL stringlen(FileTemp,FileNameLength)
       
     

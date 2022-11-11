@@ -211,6 +211,7 @@ REAL(DP), DIMENSION(nrct)                          :: MineralPercent
 REAL(DP), DIMENSION(ikin)                          :: dummy_raq_tot
 REAL(DP)                                                   :: dummy
 REAL(DP)                                                   :: dummy2
+REAL(DP)                                                   :: dum1
 
 !!!jz = 1
 PrintTime = realtime*OutputTimeScale
@@ -984,6 +985,24 @@ END DO
         DO jx = 1,nx
         WRITE(8,184) x(jx)*OutputDistanceScale,y(jy)*OutputDistanceScale,z(jz)*OutputDistanceScale,   &
         t(jx,jy,jz)
+        END DO
+      END DO
+    END DO
+    CLOSE(UNIT=8,STATUS='keep')
+
+    fn = 'Activecell'
+    ilength = 11
+    CALL newfile(fn,suf1,fnv,nint,ilength)
+    OPEN(UNIT=8,FILE=fnv, ACCESS='sequential',STATUS='unknown')
+    WRITE(8,*) 'TITLE = "Activecell (C)" '
+    WRITE(8,*) 'VARIABLES = "X"          "Y"              "Z"     "Wcres" '
+    WRITE(8,*) 'ZONE I=', nx,  ', J=',ny, ', K=',nz, ' F=POINT'
+    DO jz = 1,nz
+      DO jy = 1,ny
+        DO jx = 1,nx
+          dum1=activecell(jx,jy,jz)
+        WRITE(8,184) x(jx)*OutputDistanceScale,y(jy)*OutputDistanceScale,z(jz)*OutputDistanceScale,   &
+        dum1
         END DO
       END DO
     END DO
