@@ -52,6 +52,8 @@ USE temperature
 USE runtime
 USE NanoCrystal
 USE isotope
+USE transport
+USE flow
 
 IMPLICIT NONE
 
@@ -187,7 +189,7 @@ REAL(DP)                                                        :: NucleationTer
 REAL(DP)                                                        :: testSigma
 
 REAL(DP)                                                        :: DecayTerm
-
+REAL(DP)                                                        :: sat_thres
 
 rmin = 0.0d0
 
@@ -1124,6 +1126,16 @@ DO k = 1,nkin
 
     dppt(k,jx,jy,jz) = dppt(k,jx,jy,jz) + rmin(np,k)
 
+    IF (east_river) then
+      if (umin(k)=='Kerogene' .OR. umin(k)=='TOC_soil') then
+      sat_thres=0.6
+      if (wc(jx,jy,jz)/por(jx,jy,jz)<=sat_thres) then
+      dppt(k,jx,jy,jz)=dppt(k,jx,jy,jz)*(wc(jx,jy,jz)/por(jx,jy,jz))/sat_thres
+      else
+      dppt(k,jx,jy,jz)=dppt(k,jx,jy,jz)*sat_thres/(wc(jx,jy,jz)/por(jx,jy,jz))
+      endif
+      endif
+    endif
   
   END DO   !  End of npth parallel reaction
   

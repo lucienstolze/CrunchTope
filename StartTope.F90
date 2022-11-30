@@ -9920,6 +9920,12 @@ END IF
 section = 'transport'
 CALL readblock(nin,nout,section,found,ncount)
 
+east_river = .FALSE.                  !!  Treat this as false for default, since setting of this to true will disable other "tortuosity" options
+parchar = 'east_river'
+parfind = ' '
+CALL read_logical(nout,lchar,parchar,parfind,east_river)
+
+
 formation = 1.0d0
 uli = 1.0d0
 dcoeff = 0

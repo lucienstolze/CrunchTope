@@ -54,6 +54,7 @@ MODULE transport
   LOGICAL(LGT)                                     :: UseThresholdPorosity
   LOGICAL(LGT)                                     :: MillingtonQuirk
   LOGICAL(LGT)                                     :: Constant_Tortuosity
+  LOGICAL(LGT)                                     :: east_river
   CHARACTER (LEN=mls)                              :: TortuosityOption
 
   REAL(DP)                                         :: alfL
