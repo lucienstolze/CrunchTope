@@ -159,9 +159,9 @@ DO jy = 1,ny
       porw = por(jx,jy,jz)
       satw = 1.0-satliq(jx,jy,jz)
       if (east_river) then
-      gasd = (pore)**QuirkGas*(sate)**(UliGas)*dgas*((t(jx+1,jy,jz)/273.15)**1.81)*(101.325/70.8)
+      gasd = (pore)**QuirkGas*(sate)**(UliGas)*dgas*((t(jx+1,jy,jz)/273.15)**1.81)
       dume = pore*sate*gasd
-      gasd = (porp)**QuirkGas*(satp)**(UliGas)*dgas*((t(jx,jy,jz)/273.15)**1.81)*(101.325/70.8)
+      gasd = (porp)**QuirkGas*(satp)**(UliGas)*dgas*((t(jx,jy,jz)/273.15)**1.81)
       dumpx = porp*satp*gasd
       else
       gasd = (pore)**QuirkGas*(sate)**(UliGas)*dgas
@@ -178,9 +178,9 @@ DO jy = 1,ny
       porw = por(jx-1,jy,jz)
       satw = 1.0-satliq(jx-1,jy,jz)
       if (east_river) then
-      gasd = (porw)**QuirkGas*(satw)**(UliGas)*dgas*((t(jx-1,jy,jz)/273.15)**1.81)*(101.325/70.8)
+      gasd = (porw)**QuirkGas*(satw)**(UliGas)*dgas*((t(jx-1,jy,jz)/273.15)**1.81)
       dumw = porw*satw*gasd
-      gasd = porp**QuirkGas*(satp)**(UliGas)*dgas*((t(jx+1,jy,jz)/273.15)**1.81)*(101.325/70.8)
+      gasd = porp**QuirkGas*(satp)**(UliGas)*dgas*((t(jx+1,jy,jz)/273.15)**1.81)
       dumpx = porp*satp*gasd
       else
       gasd = (porw)**QuirkGas*(satw)**(UliGas)*dgas
@@ -197,11 +197,11 @@ DO jy = 1,ny
       porw = por(jx-1,jy,jz)
       satw = 1.0-satliq(jx-1,jy,jz)
       if (east_river) then
-      gasd = (pore)**QuirkGas*(sate)**(UliGas)*dgas*((t(jx+1,jy,jz)/273.15)**1.81)*(101.325/70.8)
+      gasd = (pore)**QuirkGas*(sate)**(UliGas)*dgas*((t(jx+1,jy,jz)/273.15)**1.81)
       dume = pore*sate*gasd
-      gasd = (porw)**QuirkGas*(satw)**(UliGas)*dgas*((t(jx-1,jy,jz)/273.15)**1.81)*(101.325/70.8)
+      gasd = (porw)**QuirkGas*(satw)**(UliGas)*dgas*((t(jx-1,jy,jz)/273.15)**1.81)
       dumw = porw*satw*gasd
-      gasd = (porp)**QuirkGas*(satp)**(UliGas)*dgas*((t(jx,jy,jz)/273.15)**1.81)*(101.325/70.8)
+      gasd = (porp)**QuirkGas*(satp)**(UliGas)*dgas*((t(jx,jy,jz)/273.15)**1.81)
       dumpx = porp*satp*gasd
       else
       gasd = (pore)**QuirkGas*(sate)**(UliGas)*dgas
@@ -224,9 +224,9 @@ DO jy = 1,ny
       pors = por(jx,jy,jz)
       sats = 1.0-satliq(jx,jy,jz)
       if (east_river) then
-      gasd = (porn)**QuirkGas*(satn)**(UliGas)*dgas*((t(jx,jy+1,jz)/273.15)**1.81)*(101.325/70.8)
+      gasd = (porn)**QuirkGas*(satn)**(UliGas)*dgas*((t(jx,jy+1,jz)/273.15)**1.81)
       dumn = porn*satn*gasd
-      gasd = (porp)**QuirkGas*(satp)**(UliGas)*dgas*((t(jx,jy,jz)/273.15)**1.81)*(101.325/70.8)
+      gasd = (porp)**QuirkGas*(satp)**(UliGas)*dgas*((t(jx,jy,jz)/273.15)**1.81)
       dumpy = porp*satp*gasd
       else
       gasd = (porn)**QuirkGas*(satn)**(UliGas)*dgas
@@ -243,9 +243,9 @@ DO jy = 1,ny
       pors = por(jx,jy-1,jz)
       sats = 1.0-satliq(jx,jy-1,jz)
       if (east_river) then
-      gasd = (pors)**QuirkGas*(sats)**(UliGas)*dgas*((t(jx,jy-1,jz)/273.15)**1.81)*(101.325/70.8)
+      gasd = (pors)**QuirkGas*(sats)**(UliGas)*dgas*((t(jx,jy-1,jz)/273.15)**1.81)
       dums = pors*sats*gasd
-      gasd = (porp)**QuirkGas*(satp)**(UliGas)*dgas*((t(jx,jy,jz)/273.15)**1.81)*(101.325/70.8)
+      gasd = (porp)**QuirkGas*(satp)**(UliGas)*dgas*((t(jx,jy,jz)/273.15)**1.81)
       dumpy = porp*satp*gasd
       else
       gasd = (pors)**QuirkGas*(sats)**(UliGas)*dgas
@@ -262,11 +262,11 @@ DO jy = 1,ny
       pors = por(jx,jy-1,jz)
       sats = 1.0-satliq(jx,jy-1,jz)
       if (east_river) then
-      gasd = (pors)**QuirkGas*(sats)**(UliGas)*dgas*((t(jx,jy-1,jz)/273.15)**1.81)*(101.325/70.8)
+      gasd = (pors)**QuirkGas*(sats)**(UliGas)*dgas*((t(jx,jy-1,jz)/273.15)**1.81)
       dums = pors*sats*gasd
-      gasd = (porn)**QuirkGas*(satn)**(UliGas)*dgas*((t(jx,jy+1,jz)/273.15)**1.81)*(101.325/70.8)
+      gasd = (porn)**QuirkGas*(satn)**(UliGas)*dgas*((t(jx,jy+1,jz)/273.15)**1.81)
       dumn = porn*satn*gasd
-      gasd = (porp)**QuirkGas*(satp)**(UliGas)*dgas*((t(jx,jy,jz)/273.15)**1.81)*(101.325/70.8)
+      gasd = (porp)**QuirkGas*(satp)**(UliGas)*dgas*((t(jx,jy,jz)/273.15)**1.81)
       dumpy = porp*satp*gasd
       else
       gasd = (pors)**QuirkGas*(sats)**(UliGas)*dgas
