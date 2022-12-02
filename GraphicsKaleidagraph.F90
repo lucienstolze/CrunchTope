@@ -648,8 +648,8 @@ IF (nrct > 0) THEN
   CALL newfile(fn,suf1,fnv,nint,ilength)
   OPEN(UNIT=8,FILE=fnv, ACCESS='sequential',STATUS='unknown')
   WRITE(8,2283) PrintTime
-  WRITE(8,107)
-131 FORMAT('# Units: % of vol occupied by mineral')
+  WRITE(8,131)
+131 FORMAT('# Units: m3 min/ m3bulk')
   WRITE(8,2285)  (uminprnt(k),k=1,nrct)
   jy = 1
   jz = 1
@@ -657,6 +657,23 @@ IF (nrct > 0) THEN
     WRITE(8,184) x(jx)*OutputDistanceScale,(volfx(k,jx,jy,jz),k = 1,nrct)
   END DO
   CLOSE(UNIT=8,STATUS='keep')
+
+
+  fn='MineralMol'
+  ilength = 10
+  CALL newfile(fn,suf1,fnv,nint,ilength)
+  OPEN(UNIT=8,FILE=fnv, ACCESS='sequential',STATUS='unknown')
+  WRITE(8,2283) PrintTime
+  WRITE(8,132)
+132 FORMAT('# Units: molmin/m3bulk')
+  WRITE(8,2285)  (uminprnt(k),k=1,nrct)
+  jy = 1
+  jz = 1
+  DO jx = 1,nx
+    WRITE(8,184) x(jx)*OutputDistanceScale,(volfx(k,jx,jy,jz)/volmol(k),k = 1,nrct)
+  END DO
+  CLOSE(UNIT=8,STATUS='keep')
+
 
   !  Write out the reaction rates in units of mol/m**3(bulk vol.)/sec
 
