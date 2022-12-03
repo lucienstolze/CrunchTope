@@ -432,11 +432,11 @@ IF (isaturate==1) THEN
     DO i = 1,ngas
       
       if (jx==0) THEN
-        gflux_hor(i)=(ag(jx+1,1,1))*(spgas10(i,jx+1,1,1)-spcondgas10(i,jinit(jx,jy,jz)))/((dxx(jx)+dxx(jx+1))/2)
+        gflux_hor(i)=(ag(jx+1,1,1))*(spgas10(i,jx+1,1,1)-spcondgas10(i,jinit(jx,jy,jz)))
       elseif (jx==nx) THEN
-        gflux_hor(i)= (cg(jx,1,1))*(spcondgas10(i,jinit(jx+1,jy,jz))-spgas10(i,jx,1,1))/((dxx(jx)+dxx(jx+1))/2)
+        gflux_hor(i)= (cg(jx,1,1))*(spcondgas10(i,jinit(jx+1,jy,jz))-spgas10(i,jx,1,1))
       else
-        gflux_hor(i)=(cg(jx,1,1))*(spgas10(i,jx+1,1,1)-spgas10(i,jx,1,1))/((dxx(jx)+dxx(jx+1))/2)
+        gflux_hor(i)=(cg(jx,1,1))*(spgas10(i,jx+1,1,1)-spgas10(i,jx,1,1))
       END IF
       if (gflux_hor(i)<1.0E-30 .and. gflux_hor(i)>-1.0E-30) THEN
         gflux_hor(i)=1.0E-30
