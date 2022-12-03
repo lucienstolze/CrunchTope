@@ -1131,7 +1131,7 @@ DO k = 1,nkin
         if (satliq(jx,jy,jz) < sat_thres) then
         dppt(k,jx,jy,jz)=dppt(k,jx,jy,jz)*(satliq(jx,jy,jz))/sat_thres
         else
-        dppt(k,jx,jy,jz)=dppt(k,jx,jy,jz)*sat_thres/(satliq(jx,jy,jz))
+        !!dppt(k,jx,jy,jz)=dppt(k,jx,jy,jz)*sat_thres/(satliq(jx,jy,jz))
         endif
         endif
     endif

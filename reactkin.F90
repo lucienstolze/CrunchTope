@@ -64,6 +64,7 @@ USE temperature, ONLY: ro,T
 USE strings
 USE runtime, ONLY: JennyDruhan,Maggi
 USE isotope
+USE transport
 
 IMPLICIT NONE
 
@@ -458,7 +459,7 @@ DO ir = 1,ikin
     ! For  microbially-mediated reactions with a biomass term, rate constants in input
     !   are in units of mol-reaction/mol-biomass/yr
 
-    vol_temp = volfx(ib,jx,jy,jz) / por(jx,jy,jz) / ro(jx,jy,jz)
+    vol_temp = volfx(ib,jx,jy,jz) / volmol(ib) / por(jx,jy,jz) / satliq(jx,jy,jz) / ro(jx,jy,jz)
 
     IF (UseMetabolicLagAqueous(jj)) THEN
       sumkin = 0.0
@@ -469,7 +470,12 @@ DO ir = 1,ikin
     ELSE
       sumkin = 0.0
       DO ll = 1,nreactkin(ir)
-        raq(ll,ir) = vol_temp*ratek(ll,ir)*pre_raq(ll,ir)*affinity
+        IF (t(jx,jy,jz)+273.15d0 == reft) THEN
+          actenergyaq(ll,ir) = 1.0D0
+          ELSE
+          actenergyaq(ll,ir) = DEXP( (actk(ll,ir)/rgasKCAL)*(reft-tkinv) )
+          END IF
+        raq(ll,ir) = vol_temp*ratek(ll,ir)*pre_raq(ll,ir)*affinity*actenergyaq(ll,ir)
         sumkin = sumkin + raq(ll,ir)
       END DO
     END IF
