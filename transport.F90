@@ -79,6 +79,8 @@ MODULE transport
   REAL(DP)                                         :: ThresholdPorosity
   REAL(DP)                                         :: TortuosityBelowThreshold
   REAL(DP)                                         :: TortuosityAboveThreshold
+  REAL(DP)                                         :: thres_OM
+  REAL(DP)                                         :: exp_OM
 
   REAL(DP), DIMENSION(16)                                         :: TempFlux
 

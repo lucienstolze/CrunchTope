@@ -188,6 +188,7 @@ REAL(DP)                                                        :: testSigma
 
 REAL(DP)                                                        :: DecayTerm
 REAL(DP)                                                        :: sat_thres
+REAL(DP)                                                        :: sat_exp
 
 rmin = 0.0d0
 
@@ -1127,9 +1128,10 @@ DO k = 1,nkin
     IF (east_river) then
 
       if (umin(k)=='Kerogene' .OR. umin(k)=='TOC_soil') then
-        sat_thres=0.6
+        sat_thres=thres_OM
+        sat_exp = exp_OM
         if (satliq(jx,jy,jz) < sat_thres) then
-        dppt(k,jx,jy,jz)=dppt(k,jx,jy,jz)*(satliq(jx,jy,jz))/sat_thres
+        dppt(k,jx,jy,jz)=dppt(k,jx,jy,jz)*((satliq(jx,jy,jz))/sat_thres)**sat_exp
         else
         !!dppt(k,jx,jy,jz)=dppt(k,jx,jy,jz)*sat_thres/(satliq(jx,jy,jz))
         endif

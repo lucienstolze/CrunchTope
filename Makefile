@@ -352,6 +352,7 @@ SOURCEF = \
           read_permyfile.F90\
           read_actpressurefile.F90\
           read_activecellfile.F90\
+          read_eastriver_param.F90\
 
 
 OBJSF  =  crunchtype.o\
@@ -703,6 +704,7 @@ OBJSF  =  crunchtype.o\
           read_permyfile.o\
           read_actpressurefile.o\
           read_activecellfile.o\
+          read_eastriver_param.o\
 
 LOCDIR   = ${CrunchTope_Dir}
 
