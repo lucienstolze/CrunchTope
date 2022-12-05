@@ -1132,6 +1132,8 @@ DO k = 1,nkin
         sat_exp = exp_OM
         if (satliq(jx,jy,jz) < sat_thres) then
         dppt(k,jx,jy,jz)=dppt(k,jx,jy,jz)*((satliq(jx,jy,jz))/sat_thres)**sat_exp
+        pre_rmin(np,k)=pre_rmin(np,k)*((satliq(jx,jy,jz))/sat_thres)**sat_exp
+        rmin(np,k)=rmin(np,k)*((satliq(jx,jy,jz))/sat_thres)**sat_exp
         else
         !!dppt(k,jx,jy,jz)=dppt(k,jx,jy,jz)*sat_thres/(satliq(jx,jy,jz))
         endif

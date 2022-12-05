@@ -52,6 +52,7 @@ USE solver
 USE medium
 USE temperature
 USE isotope
+USE transport
 
 IMPLICIT NONE
 
@@ -257,6 +258,9 @@ REAL(DP)                                                        :: checkNucleati
 REAL(DP), PARAMETER                                             :: BoltzmannTerm=1.3806E-20
 REAL(DP)                                                        :: NucleationTerm
 REAL(DP)                                                        :: testSigma
+
+REAL(DP)                                                        :: sat_thres
+REAL(DP)                                                        :: sat_exp
 
 !!!NoFractionationDissolution = .false.
 
@@ -1052,7 +1056,23 @@ DO k = 1,nkin
 
       END IF    
 
-      
+      ! IF (east_river) then
+
+      !   if (umin(k)=='Kerogene' .OR. umin(k)=='TOC_soil') then
+      !     sat_thres=thres_OM
+      !     sat_exp = exp_OM
+      !     if (satliq(jx,jy,jz) < sat_thres) then
+      !       DO i = 1,ncomp
+      !       jac_rmin(i,np,k)=jac_rmin(i,np,k)*((satliq(jx,jy,jz))/sat_thres)**sat_exp
+      !       jac_sat(i)=jac_sat(i)*((satliq(jx,jy,jz))/sat_thres)**sat_exp
+      !       ENDDO
+      !     else
+      !     !!dppt(k,jx,jy,jz)=dppt(k,jx,jy,jz)*sat_thres/(satliq(jx,jy,jz))
+      !     endif
+      !     endif
+      ! endif
+
+
     END DO    !! End of np loop through parallel reactions
     
   END IF      !! End of IF block for calculation of Jacobian
