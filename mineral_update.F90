@@ -141,7 +141,7 @@ DO jz = 1,nz
         IF (MineralAssociate(k)) THEN
             
           kk = MineralID(k)
-          IF (spinup .AND. umin(k)/='C5H7O2N(s)') THEN
+          IF (spinup .AND. umin(k)/='C5H7O2N(s)' .AND. umin(k)/='C5H7O2N(s)_decay') THEN
           VolumeUpdate = 0  
           ELSE
           VolumeUpdate = volmol(kk)*dppt(k,jx,jy,jz)*dt   !  Point to volume fraction of associated mineral
@@ -157,7 +157,7 @@ DO jz = 1,nz
           
         ELSE
           
-          IF (spinup .AND. umin(k)/='C5H7O2N(s)') THEN
+          IF (spinup .AND. umin(k)/='C5H7O2N(s)' .AND. umin(k)/='C5H7O2N(s)_decay') THEN
             VolumeUpdate = 0  
           ELSE
           VolumeUpdate = volmol(k)*dppt(k,jx,jy,jz)*dt
@@ -232,7 +232,7 @@ DO jz = 1,nz
         IF (MineralAssociate(k)) THEN
             
           kk = MineralID(k)
-          IF (spinup .AND. umin(k)/='C5H7O2N(s)') THEN
+          IF (spinup .AND. umin(k)/='C5H7O2N(s)' .AND. umin(k)/='C5H7O2N(s)_decay') THEN
             VolumeUpdate = 0  
             ELSE
           VolumeUpdate = volmol(kk)*dppt(k,jx,jy,jz)*dt   !  Point to volume fraction of associated mineral
@@ -244,7 +244,7 @@ DO jz = 1,nz
           
         ELSE
           
-          IF (spinup .AND. umin(k)/='C5H7O2N(s)') THEN
+          IF (spinup .AND. umin(k)/='C5H7O2N(s)' .AND. umin(k)/='C5H7O2N(s)_decay') THEN
           VolumeUpdate = 0  
           ELSE
           VolumeUpdate = volmol(k)*dppt(k,jx,jy,jz)*dt
