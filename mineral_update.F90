@@ -157,7 +157,7 @@ DO jz = 1,nz
           
         ELSE
           
-          IF ((spinup .AND. umin(k)/='C5H7O2N(s)')) THEN
+          IF (spinup .AND. umin(k)/='C5H7O2N(s)') THEN
             VolumeUpdate = 0  
           ELSE
           VolumeUpdate = volmol(k)*dppt(k,jx,jy,jz)*dt
