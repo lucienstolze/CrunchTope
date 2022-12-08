@@ -2566,7 +2566,6 @@ avg_count=avg_count+delt
 if (time > 1e-3) then
   IF (walltime) then
     call CPU_TIME(PrintSeconds)
-    write(*,*) PrintSeconds/60
     
   IF ((PrintSeconds/60.0d0)>wall_t) then
     write(*,*)
