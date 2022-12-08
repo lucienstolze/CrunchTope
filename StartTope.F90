@@ -833,7 +833,7 @@ CALL stringlen(ltitle,lchar)
 WRITE(*,*) ' Title of simulation: ', ltitle(1:72)
 WRITE(*,*)
 
-
+!  *****************TRANSPORT BLOCK***********************
 section = 'runtime'
 CALL readblock(nin,nout,section,found,ncount)
 
@@ -843,6 +843,9 @@ IF (found) THEN
 !!  WRITE(*,*)
 
 ! Now, find the individual parameters within block
+
+
+call read_walltime(nin,nx,ny,nz)
 
   parchar = 'gimrt'
   parfind = ' '

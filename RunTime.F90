@@ -162,4 +162,7 @@ MODULE runtime
 
   CHARACTER (LEN=mls), DIMENSION(:), ALLOCATABLE                :: BoundaryConditionName
 
+  LOGICAL(LGT)                                                :: walltime
+  REAL(DP)                                                    :: wall_t
+  
 END MODULE runtime

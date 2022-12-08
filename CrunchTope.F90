@@ -2020,7 +2020,16 @@ DO WHILE (nn <= nend)
           END DO
         END IF
     ! **************  START NEWTON LOOP  *******************
-
+        
+IF (walltime) then
+        call CPU_TIME(PrintSeconds)
+      IF (DINT(PrintSeconds/60.0d0)>wall_t) then
+        write(*,*)
+        write(*,*) 'WALLTIME REACHED'
+        write(*,*)
+        stop
+      ENDIF
+endif
         5000     NE = 0
         icvg = 1
         iterat = 0
