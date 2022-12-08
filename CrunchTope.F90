@@ -3195,15 +3195,6 @@ END IF
 !!  OPEN(unit=98,file='vySonnenthal.dat',status='unknown')
 !!  WRITE(98,*)(((qy(jx,jy,jz),jx=1,nx),jy=0,ny),jz=1,nz)
 !!  close(unit=98)
-IF (walltime) then
-  call CPU_TIME(PrintSeconds)
-IF (DINT(PrintSeconds/60.0d0)>wall_t) then
-  write(*,*)
-  write(*,*) 'WALLTIME REACHED'
-  write(*,*)
-  stop
-ENDIF
-endif
 
   IF (time+delt > prtint(nint) .AND. prtint(nint) /= time) THEN
     delt = prtint(nint) - time
@@ -3710,6 +3701,16 @@ endif
     iprnt = 0
   END IF
 
+  IF (walltime) then
+    call CPU_TIME(PrintSeconds)
+  IF (DINT(PrintSeconds/60.0d0)>wall_t) then
+    write(*,*)
+    write(*,*) 'WALLTIME REACHED'
+    write(*,*)
+    stop
+  ENDIF
+  endif
+  
 END DO    ! End of time loop
 
 !  ***************  END OF TIME LOOP  **********************
