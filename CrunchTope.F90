@@ -2563,7 +2563,19 @@ END DO
 avg_count=avg_count+delt
 
   time = time + delt
-
+if (time > 1e-3) then
+  IF (walltime) then
+    call CPU_TIME(PrintSeconds)
+    write(*,*) PrintSeconds/60
+    
+  IF ((PrintSeconds/60.0d0)>wall_t) then
+    write(*,*)
+    write(*,*) 'WALLTIME REACHED'
+    write(*,*)
+    stop
+  ENDIF
+  endif
+endif
 !  Check charge balance
 
 !    totcharge = 0.0
@@ -3701,16 +3713,6 @@ END IF
     iprnt = 0
   END IF
 
-  IF (walltime) then
-    call CPU_TIME(PrintSeconds)
-  IF (DINT(PrintSeconds/60.0d0)>wall_t) then
-    write(*,*)
-    write(*,*) 'WALLTIME REACHED'
-    write(*,*)
-    stop
-  ENDIF
-  endif
-  
 END DO    ! End of time loop
 
 !  ***************  END OF TIME LOOP  **********************
