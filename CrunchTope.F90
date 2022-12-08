@@ -2020,16 +2020,6 @@ DO WHILE (nn <= nend)
           END DO
         END IF
     ! **************  START NEWTON LOOP  *******************
-        
-IF (walltime) then
-        call CPU_TIME(PrintSeconds)
-      IF (DINT(PrintSeconds/60.0d0)>wall_t) then
-        write(*,*)
-        write(*,*) 'WALLTIME REACHED'
-        write(*,*)
-        stop
-      ENDIF
-endif
         5000     NE = 0
         icvg = 1
         iterat = 0
@@ -3205,7 +3195,15 @@ END IF
 !!  OPEN(unit=98,file='vySonnenthal.dat',status='unknown')
 !!  WRITE(98,*)(((qy(jx,jy,jz),jx=1,nx),jy=0,ny),jz=1,nz)
 !!  close(unit=98)
-
+IF (walltime) then
+  call CPU_TIME(PrintSeconds)
+IF (DINT(PrintSeconds/60.0d0)>wall_t) then
+  write(*,*)
+  write(*,*) 'WALLTIME REACHED'
+  write(*,*)
+  stop
+ENDIF
+endif
 
   IF (time+delt > prtint(nint) .AND. prtint(nint) /= time) THEN
     delt = prtint(nint) - time
