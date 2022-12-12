@@ -100,6 +100,8 @@ INTEGER(I4B)                                         :: nnisotope
 
 REAL(DP)                                             :: bqTMP
 REAL(DP)                                             :: tk
+REAL(DP)                                                        :: tkinv
+REAL(DP)                                                        :: reft
 REAL(DP)                                             :: sign
 REAL(DP)                                             :: term1
 REAL(DP)                                             :: perturb
@@ -138,6 +140,8 @@ real(dp)                                                       :: vol_temp
 ALLOCATE(stmp(ncomp))
 
 tk = t(jx,jy,jz) + 273.15D0
+tkinv = 1.0D0/tk
+reft = 1.0D0/278.15D0 !! REF temperature (for now 5 degree)
 
 ! biomass end
 
@@ -548,8 +552,13 @@ DO ir = 1,ikin
     ELSE
       DO i = 1,ncomp
         DO ll = 1,nreactkin(ir)
+          IF (t(jx,jy,jz)+273.15d0 == reft) THEN
+            actenergyaq(ll,ir) = 1.0D0
+            ELSE
+            actenergyaq(ll,ir) = DEXP( (actk(ll,ir)/rgasKCAL)*(reft-tkinv) )
+            END IF
           rdkin(ir,i) = rdkin(ir,i) + vol_temp * ratek(ll,ir) *  &
-            (pre_raq(ll,ir)*jac_sat(i) +  jac_prekin(i,ll)*affinity  )
+            (pre_raq(ll,ir)*jac_sat(i) +  jac_prekin(i,ll)*affinity  )*actenergyaq(ll,ir)
         END DO
       END DO
     END IF
@@ -558,8 +567,13 @@ DO ir = 1,ikin
 
     DO i = 1,ncomp
       DO ll = 1,nreactkin(ir)
+        IF (t(jx,jy,jz)+273.15d0 == reft) THEN
+          actenergyaq(ll,ir) = 1.0D0
+          ELSE
+          actenergyaq(ll,ir) = DEXP( (actk(ll,ir)/rgasKCAL)*(reft-tkinv) )
+          END IF
         rdkin(ir,i) = rdkin(ir,i) + ratek(ll,ir)*  &
-            (pre_raq(ll,ir)*jac_sat(i) +  jac_prekin(i,ll)*affinity )
+            (pre_raq(ll,ir)*jac_sat(i) +  jac_prekin(i,ll)*affinity )*actenergyaq(ll,ir)
       END DO
     END DO
 
