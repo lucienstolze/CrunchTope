@@ -670,7 +670,7 @@ IF (nrct > 0) THEN
   jy = 1
   jz = 1
   DO jx = 1,nx
-    WRITE(8,184) x(jx)*OutputDistanceScale,(volfx(k,jx,jy,jz)/volmol(k),k = 1,nrct)
+    WRITE(8,184) x(jx)*OutputDistanceScale,(volfx(k,jx,jy,jz)*dxx(jx)*dyy(jy)*dzz(jx,jy,jz)/volmol(k),k = 1,nrct)
   END DO
   CLOSE(UNIT=8,STATUS='keep')
 
