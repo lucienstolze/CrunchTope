@@ -212,7 +212,7 @@ DO ir = 1,ikin
       i = inhibitaq(id,ir)
       IF (inhibitaq(id,ir) < 0) THEN                 !! Dependence on mineral volume fraction
         k = -inhibitaq(id,ir)
-        MinConvert = volfx(k,jx,jy,jz)/(volmol(k)*por(jx,jy,jz)*ro(jx,jy,jz))  !! Converts mineral volume fraction to moles mineral per kg fluid (molality)                                  
+        MinConvert = volfx(k,jx,jy,jz)/(volmol(k)*por(jx,jy,jz)*ro(jx,jy,jz)*satliq(jx,jy,jz))  !! Converts mineral volume fraction to moles mineral per kg fluid (molality)                                  
         term_inhibit =  rinhibitaq(id,ir)/(MinConvert + rinhibitaq(id,ir))
         term2 = term2 * term_inhibit
       ELSE
@@ -242,16 +242,16 @@ DO ir = 1,ikin
 !!    affinity = 1.0
 
 !! Biomass option
-  ELSE IF (iaqtype(ir) == 8) THEN    ! Monod kinetics, but with thermodynamic fact, F_T
+   ELSEIF (iaqtype(ir) == 8) THEN    ! Monod kinetics, but with thermodynamic fact, F_T
 
 !! NOTE: ---> This assumes only ONE parallel reaction for Monod
 
 !!  Normal Monod terms
 
-    term2 = 1.0d0
+     term2 = 1.0d0
 
-    DO id = 1,nmonodaq(ir)
-      i = imonodaq(id,ir)
+     DO id = 1,nmonodaq(ir)
+       i = imonodaq(id,ir)
 
 !!!      IF (nIsotopePrimary > 0) THEN
 
@@ -301,10 +301,10 @@ DO ir = 1,ikin
 
       ELSE   !! General case where no isotopes involved
 
-        IF (itot_monodaq(id,ir) == 1) THEN
+         IF (itot_monodaq(id,ir) == 1) THEN
 
-         termMonod(id,ir) = s(i,jx,jy,jz)/(s(i,jx,jy,jz)+halfsataq(id,ir))
-         term2 = term2 * termMonod(id,ir)
+          termMonod(id,ir) = s(i,jx,jy,jz)/(s(i,jx,jy,jz)+halfsataq(id,ir))
+          term2 = term2 * termMonod(id,ir)
 
         ELSE      !! Case where individual species concentration is used in hyperbolic term
 
@@ -316,15 +316,15 @@ DO ir = 1,ikin
 
     END DO 
 
-! prague - add inhibition - 
+! ! prague - add inhibition - 
 
-!!!  Inhibition terms
-!
+!!  Inhibition terms
+
     DO id = 1,ninhibitaq(ir)
       i = inhibitaq(id,ir)
       IF (inhibitaq(id,ir) < 0) THEN                 !! Dependence on mineral volume fraction
         k = -inhibitaq(id,ir)
-        MinConvert = volfx(k,jx,jy,jz)/(volmol(k)*por(jx,jy,jz)*ro(jx,jy,jz))  !! Converts mineral volume fraction to moles mineral per kg fluid (molality)                                  
+        MinConvert = volfx(k,jx,jy,jz)/(volmol(k)*por(jx,jy,jz)*ro(jx,jy,jz)*satliq(jx,jy,jz))  !! Converts mineral volume fraction to moles mineral per kg fluid (molality)                                  
         term_inhibit =  rinhibitaq(id,ir)/(MinConvert + rinhibitaq(id,ir))
         term2 = term2 * term_inhibit
         write(*,*) k,term_inhibit
@@ -419,16 +419,16 @@ DO ir = 1,ikin
       snormAqueous = satkin(ir)
     END IF
 
-    term1 = sign*DABS(snormAqueous - 1.0D0)
+     term1 = sign*DABS(snormAqueous - 1.0D0)
 
-!!  Reaction assumed to be irreversible, so do not let it go in reverse
+ !!  Reaction assumed to be irreversible, so do not let it go in reverse
 
-    affinity = MAX(0.0d0,term1)
+     affinity = MAX(0.0d0,term1)
     
-!! NOTE: ---> This assumes only ONE parallel reaction for Monod
+ !! NOTE: ---> This assumes only ONE parallel reaction for Monod
 
-    pre_raq(1,ir) = term2
-! biomass end
+     pre_raq(1,ir) = sign*term2
+ ! biomass end
 
     
   ELSE
@@ -445,6 +445,7 @@ DO ir = 1,ikin
 ! biomass
   if (iaqtype(ir) == 8) then
 
+    jj = ir
 !   pointer to biomass for current reaction
   !!  ib = ibiomass_kin(p_cat_kin(ir))
     ib = ibiomass_kin(ir)
@@ -459,7 +460,9 @@ DO ir = 1,ikin
     ! For  microbially-mediated reactions with a biomass term, rate constants in input
     !   are in units of mol-reaction/mol-biomass/yr
 
-    vol_temp = volfx(ib,jx,jy,jz) / volmol(ib) / por(jx,jy,jz) / satliq(jx,jy,jz) / ro(jx,jy,jz)
+    !!vol_temp = volfx(ib,jx,jy,jz)
+    !! Convert back vol_temp from [mol/m3bulk] to [mol/Lw]
+    vol_temp = volfx(ib,jx,jy,jz) / (por(jx,jy,jz) * ro(jx,jy,jz) * satliq(jx,jy,jz))
 
     IF (UseMetabolicLagAqueous(jj)) THEN
       sumkin = 0.0
@@ -478,7 +481,7 @@ DO ir = 1,ikin
         raq(ll,ir) = vol_temp*ratek(ll,ir)*pre_raq(ll,ir)*affinity*actenergyaq(ll,ir)
         sumkin = sumkin + raq(ll,ir)
       END DO
-    END IF
+     END IF
 
   else
 

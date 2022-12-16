@@ -690,7 +690,7 @@ DO k = 1,nkin
         DO kk = 1,nmonod(np,k)
           IF (imonod(kk,np,k) == 0 .AND. kmonod(kk,np,k) == 1) THEN                !! Mineral Monod reaction depends on its own concentration
             surf(np,k) = 1.0d0                                                        !! Resets surface area to a constant 1
-            MinConvert = volfx(k,jx,jy,jz)/(volmol(k)*por(jx,jy,jz)*ro(jx,jy,jz))  !! Converts mineral volume fraction to moles mineral per kg fluid (molality)                                  
+            MinConvert = volfx(k,jx,jy,jz)/(volmol(k)*por(jx,jy,jz)*ro(jx,jy,jz)*satliq(jx,jy,jz))  !! Converts mineral volume fraction to moles mineral per kg fluid (molality)                                  
             checkmonod =  MinConvert/(MinConvert+halfsat(kk,np,k))
             term2 = term2 * checkmonod 
           ELSE                                                                     !! Monod term depends on aqueous species
@@ -765,7 +765,7 @@ DO k = 1,nkin
         DO kk = 1,nmonod(np,k)
           IF (imonod(kk,np,k) == 0 .AND. kmonod(kk,np,k) == 1) THEN                !! Mineral Monod reaction depends on its own concentration
             surf(np,k) = 1.0d0                                                        !! Resets surface area to a constant 1
-            MinConvert = volfx(k,jx,jy,jz)/(volmol(k)*por(jx,jy,jz)*ro(jx,jy,jz))  !! Converts mineral volume fraction to moles mineral per kg fluid (molality)                                  
+            MinConvert = volfx(k,jx,jy,jz)/(volmol(k)*por(jx,jy,jz)*ro(jx,jy,jz)*satliq(jx,jy,jz))  !! Converts mineral volume fraction to moles mineral per kg fluid (molality)                                  
             checkmonod =  MinConvert/(MinConvert+halfsat(kk,np,k))
             term2 = term2 * checkmonod 
           ELSE                                                                     !! Monod term depends on aqueous species

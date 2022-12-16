@@ -1644,6 +1644,11 @@ parchar = 'kinetic_database'
   spinup = .false.
   CALL read_logical(nout,lchar,parchar,parfind,spinup)
 
+  parchar = 'biomassfixed'
+  parfind = ' '
+  biomassfixed = .false.
+  CALL read_logical(nout,lchar,parchar,parfind,biomassfixed)
+
   parchar = 'Inagaki'
   parfind = ' '
   inagaki = .FALSE.

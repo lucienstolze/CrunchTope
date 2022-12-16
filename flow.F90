@@ -203,6 +203,7 @@ REAL(DP), DIMENSION(:), ALLOCATABLE             :: wattab_t
 LOGICAL(LGT)                                    :: watertabletimeseries
 !! Disable mineralupdate during model spinup
 LOGICAL(LGT)                                   :: spinup ! Lucien Stolze 20220731
+LOGICAL(LGT)                                   :: biomassfixed ! Lucien Stolze 20220731
 !!Evapotranspiration timeseries
 REAL(DP), DIMENSION(:), ALLOCATABLE          :: qt_evapo
 REAL(DP), DIMENSION(:), ALLOCATABLE             :: t_evapo

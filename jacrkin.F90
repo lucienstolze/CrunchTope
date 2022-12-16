@@ -346,115 +346,160 @@ DO ir = 1,ikin
      END DO
 
 ! biomass
-  ELSE IF (iaqtype(ir) == 8) THEN       ! Monod, but with thermodynamic factor, F_T
-      
+ELSEIF (iaqtype(ir) == 8) THEN       ! Monod, but with thermodynamic factor, F_T
+
 !! Normal Monod terms
 
-    DO id = 1,nmonodaq(ir)
-      i = imonodaq(id,ir)        !! Pointer to the primary species in the Monod expression (e.g., electron donor or acceptor)
-
-!!!      IF (nIsotopePrimary > 0) THEN
-          
-        IF (IsotopePrimaryCommon(i)) THEN
-
-          IsotopologueOther = isotopeRare(iPointerIsotope(i))
-          IF (itot_monodaq(id,ir) == 1) THEN                 ! Dependence on total concentration
-            MonodTerm = s(i,jx,jy,jz)/( s(i,jx,jy,jz)+ halfsataq(id,ir)*(1.0d0+s(IsotopologueOther,jx,jy,jz)/halfsataq(id,ir)) )
-          ELSE                                              ! Dependence on individual species
-            MonodTerm = sp10(i,jx,jy,jz)/( sp10(i,jx,jy,jz) + halfsataq(id,ir)*(1.0d0+sp10(IsotopologueOther,jx,jy,jz)/halfsataq(id,ir)) )
-          END IF
-
-        ELSE IF (IsotopePrimaryRare(i)) THEN
-
-          IsotopologueOther = isotopeCommon(iPointerIsotope(i))
-          IF (itot_monodaq(id,ir) == 1) THEN                 ! Dependence on total concentration
-            MonodTerm = s(i,jx,jy,jz)/( s(i,jx,jy,jz)+ halfsataq(id,ir)*(1.0d0+s(IsotopologueOther,jx,jy,jz)/halfsataq(id,ir)) )
-          ELSE                                               ! Dependence on individual species
-            MonodTerm = sp10(i,jx,jy,jz)/( sp10(i,jx,jy,jz)+ halfsataq(id,ir)*(1.0d0+sp10(IsotopologueOther,jx,jy,jz)/halfsataq(id,ir)) )
-          END IF
-        
-!!!        ELSE
-          
-!!!           WRITE(*,*)
-!!!           WRITE(*,*) ' Should be either the Common or Rare isotope in jacrkin.F90'
-!!!           WRITE(*,*)
-!!!           READ(*,*)
-!!!           STOP
-        
-!!!         END IF
-
-      ELSE    !general case - no isotopes
-          
-        IF (itot_monodaq(id,ir) == 1) THEN                 ! Dependence on total concentration
-          MonodTerm = s(i,jx,jy,jz)/(halfsataq(id,ir)+s(i,jx,jy,jz) )
-        ELSE
-          MonodTerm = sp10(i,jx,jy,jz)/(halfsataq(id,ir)+sp10(i,jx,jy,jz))
-        END IF
-        
-      END IF
-
+  DO id = 1,nmonodaq(ir)
+    i = imonodaq(id,ir)
+    IF (itot_monodaq(id,ir) == 1) THEN                 ! Dependence on total concentration
+      denom = (s(i,jx,jy,jz)+halfsataq(id,ir)) * (s(i,jx,jy,jz)+halfsataq(id,ir))
+      MonodTerm = s(i,jx,jy,jz)/(halfsataq(id,ir)+s(i,jx,jy,jz))
       DO i2 = 1,ncomp
+        IF (os3d) THEN
+           jac_prekin(i2,1) =  jac_prekin(i2,1) +  &
+              pre_raq(1,ir)/MonodTerm * fjac_loc(i2,i)*halfsataq(id,ir)/denom
 
-!! Now do the numerical perturbation       
+!!              fjac_loc(i2,i)*pre_raq(1,ir)* ( 1.0/s(i,jx,jy,jz) - 1.0/(s(i,jx,jy,jz)+halfsataq(id,ir))  )
+!!               fjac_loc(i2,i)*halfsataq(id,ir)/denom
+        ELSE
+           jac_prekin(i2,1) =  jac_prekin(i2,1) +  &
+              pre_raq(1,ir)/MonodTerm * fjac(i2,i,jx,jy,jz)*halfsataq(id,ir)/denom
 
-!!!        IF (nIsotopePrimary > 0) THEN
-            
-          IF (IsotopePrimaryCommon(i)) THEN
-
-            IsotopologueOther = isotopeRare(iPointerIsotope(i))
-            IF (itot_monodaq(id,ir) == 1) THEN                 ! Dependence on total concentration
-              MonodTermPerturb = sTMPperturb(i2,i)/( sTMPperturb(i2,i) + halfsataq(id,ir)*(1.0d0+sTMPperturb(i2,IsotopologueOther)/halfsataq(id,ir)) )
-            ELSE                                               ! Dependence on individual species
-              MonodTermPerturb = sp10(i,jx,jy,jz)/( sp10(i,jx,jy,jz)+ halfsataq(id,ir)*(1.0d0+sp10(IsotopologueOther,jx,jy,jz)/halfsataq(id,ir)) )
-            END IF
-
-          ELSE IF (IsotopePrimaryRare(i)) THEN
-
-            IsotopologueOther = isotopeCommon(iPointerIsotope(i))
-            IF (itot_monodaq(id,ir) == 1) THEN                 ! Dependence on total concentration
-              MonodTermPerturb = sTMPperturb(i2,i)/( sTMPperturb(i2,i) + halfsataq(id,ir)*(1.0d0+sTMPperturb(i2,IsotopologueOther)/halfsataq(id,ir)) )
-            ELSE                                               ! Dependence on individual species
-              MonodTermPerturb = sp10(i,jx,jy,jz)/( sp10(i,jx,jy,jz)+ halfsataq(id,ir)*(1.0d0+sp10(IsotopologueOther,jx,jy,jz)/halfsataq(id,ir)) )
-            END IF
-            
-!!!          ELSE
-          
-!!!            WRITE(*,*)
-!!!            WRITE(*,*) ' Should be either the Common or Rare isotope in jacrkin.F90'
-!!!            WRITE(*,*)
-!!!            READ(*,*)
-!!!            STOP
-        
-!!!          END IF
-
-        ELSE    !general case - no isotopes
-            
-          IF (itot_monodaq(id,ir) == 1) THEN                 ! Dependence on total concentration
-            MonodTermPerturb = sTMPperturb(i2,i)/( sTMPperturb(i2,i) + halfsataq(id,ir) )
-          ELSE
-            IF (i == i2) THEN 
-              MonodTermPerturb = sppTMP10perturb(i)/(halfsataq(id,ir)+sppTMP10perturb(i))
-            ELSE
-              MonodTermPerturb = sp10(i,jx,jy,jz)/(halfsataq(id,ir)+sp10(i,jx,jy,jz))
-            END IF
-          END IF
-          
-        END IF         
-
-        OtherMonodTerms = 1.0d0
-        DO idDummy = 1,nmonodaq(ir)
-          IF (id /= idDummy) THEN
-            OtherMonodTerms = OtherMonodTerms*termMonod(idDummy,ir)
-          END IF
-        END DO
-
-        DerivativeMonodTerm = (MonodTermPerturb - MonodTerm )/perturb 
-
-        jac_prekin(i2,1) = jac_prekin(i2,1) + OtherMonodTerms*DerivativeMonodTerm
-
+!!              fjac(i2,i,jx,jy,jz)*pre_raq(1,ir)*( 1.0/s(i,jx,jy,jz) - 1.0/(s(i,jx,jy,jz)+halfsataq(id,ir))  )
+!!              fjac(i2,i,jx,jy,jz)*halfsataq(id,ir)/denom
+        END IF
       END DO
+    ELSE
+      denom = (sp10(i,jx,jy,jz)+halfsataq(id,ir))*(sp10(i,jx,jy,jz)+halfsataq(id,ir))
+      MonodTerm = sp10(i,jx,jy,jz)/(halfsataq(id,ir)+sp10(i,jx,jy,jz))
+      IF (i <= ncomp) THEN
+!!           jac_prekin(i,1) =  jac_prekin(i,1) +  &
+!!              pre_raq(1,ir)*( 1.0 - sp10(i,jx,jy,jz)/(sp10(i,jx,jy,jz)+halfsataq(id,ir)) )
+!! Or
+         jac_prekin(i,1) =  jac_prekin(i,1) +  &
+            pre_raq(1,ir)/MonodTerm * sp10(i,jx,jy,jz)*halfsataq(id,ir)/denom
 
-    END DO
+!!              sp10(i,jx,jy,jz)*halfsataq(id,ir)/denom
+      ELSE
+        ksp = i - ncomp
+        DO i2 = 1,ncomp
+           jac_prekin(i2,1) =  jac_prekin(i2,1) +  &
+            pre_raq(1,ir)/MonodTerm * muaq(ksp,i2)*sp10(i,jx,jy,jz)*halfsataq(id,ir)/denom
+
+!!                pre_raq(1,ir)* muaq(ksp,i2)* (1.0 - sp10(i,jx,jy,jz)/(sp10(i,jx,jy,jz)+halfsataq(id,ir)) )
+        END DO
+      END IF
+    END IF
+  END DO
+
+!! Normal Monod terms
+
+!     DO id = 1,nmonodaq(ir)
+!       i = imonodaq(id,ir)        !! Pointer to the primary species in the Monod expression (e.g., electron donor or acceptor)
+
+! ! !!!      IF (nIsotopePrimary > 0) THEN
+          
+! ! !         IF (IsotopePrimaryCommon(i)) THEN
+
+! ! !           IsotopologueOther = isotopeRare(iPointerIsotope(i))
+! ! !           IF (itot_monodaq(id,ir) == 1) THEN                 ! Dependence on total concentration
+! ! !             MonodTerm = s(i,jx,jy,jz)/( s(i,jx,jy,jz)+ halfsataq(id,ir)*(1.0d0+s(IsotopologueOther,jx,jy,jz)/halfsataq(id,ir)) )
+! ! !           ELSE                                              ! Dependence on individual species
+! ! !             MonodTerm = sp10(i,jx,jy,jz)/( sp10(i,jx,jy,jz) + halfsataq(id,ir)*(1.0d0+sp10(IsotopologueOther,jx,jy,jz)/halfsataq(id,ir)) )
+! ! !           END IF
+
+! ! !         ELSE IF (IsotopePrimaryRare(i)) THEN
+
+! ! !           IsotopologueOther = isotopeCommon(iPointerIsotope(i))
+! ! !           IF (itot_monodaq(id,ir) == 1) THEN                 ! Dependence on total concentration
+! ! !             MonodTerm = s(i,jx,jy,jz)/( s(i,jx,jy,jz)+ halfsataq(id,ir)*(1.0d0+s(IsotopologueOther,jx,jy,jz)/halfsataq(id,ir)) )
+! ! !           ELSE                                               ! Dependence on individual species
+! ! !             MonodTerm = sp10(i,jx,jy,jz)/( sp10(i,jx,jy,jz)+ halfsataq(id,ir)*(1.0d0+sp10(IsotopologueOther,jx,jy,jz)/halfsataq(id,ir)) )
+! ! !           END IF
+        
+! ! ! !!!        ELSE
+          
+! ! ! !!!           WRITE(*,*)
+! ! ! !!!           WRITE(*,*) ' Should be either the Common or Rare isotope in jacrkin.F90'
+! ! ! !!!           WRITE(*,*)
+! ! ! !!!           READ(*,*)
+! ! ! !!!           STOP
+        
+! ! ! !!!         END IF
+
+! !       ELSE    !general case - no isotopes
+          
+!         IF (itot_monodaq(id,ir) == 1) THEN                 ! Dependence on total concentration
+!           MonodTerm = s(i,jx,jy,jz)/(halfsataq(id,ir)+s(i,jx,jy,jz) )
+!         ELSE
+!           MonodTerm = sp10(i,jx,jy,jz)/(halfsataq(id,ir)+sp10(i,jx,jy,jz))
+!         END IF
+        
+! !      END IF
+
+!        DO i2 = 1,ncomp
+
+! ! !! Now do the numerical perturbation       
+
+! ! !!!        IF (nIsotopePrimary > 0) THEN
+            
+! !           IF (IsotopePrimaryCommon(i)) THEN
+
+! ! !             IsotopologueOther = isotopeRare(iPointerIsotope(i))
+! ! !             IF (itot_monodaq(id,ir) == 1) THEN                 ! Dependence on total concentration
+! ! !               MonodTermPerturb = sTMPperturb(i2,i)/( sTMPperturb(i2,i) + halfsataq(id,ir)*(1.0d0+sTMPperturb(i2,IsotopologueOther)/halfsataq(id,ir)) )
+! ! !             ELSE                                               ! Dependence on individual species
+! ! !               MonodTermPerturb = sp10(i,jx,jy,jz)/( sp10(i,jx,jy,jz)+ halfsataq(id,ir)*(1.0d0+sp10(IsotopologueOther,jx,jy,jz)/halfsataq(id,ir)) )
+! ! !             END IF
+
+! ! !           ELSE IF (IsotopePrimaryRare(i)) THEN
+
+! ! !             IsotopologueOther = isotopeCommon(iPointerIsotope(i))
+! ! !             IF (itot_monodaq(id,ir) == 1) THEN                 ! Dependence on total concentration
+! ! !               MonodTermPerturb = sTMPperturb(i2,i)/( sTMPperturb(i2,i) + halfsataq(id,ir)*(1.0d0+sTMPperturb(i2,IsotopologueOther)/halfsataq(id,ir)) )
+! ! !             ELSE                                               ! Dependence on individual species
+! ! !               MonodTermPerturb = sp10(i,jx,jy,jz)/( sp10(i,jx,jy,jz)+ halfsataq(id,ir)*(1.0d0+sp10(IsotopologueOther,jx,jy,jz)/halfsataq(id,ir)) )
+! ! !             END IF
+            
+! ! ! !!!          ELSE
+          
+! ! ! !!!            WRITE(*,*)
+! ! ! !!!            WRITE(*,*) ' Should be either the Common or Rare isotope in jacrkin.F90'
+! ! ! !!!            WRITE(*,*)
+! ! ! !!!            READ(*,*)
+! ! ! !!!            STOP
+        
+! ! ! !!!          END IF
+
+! !         ELSE    !general case - no isotopes
+            
+!           IF (itot_monodaq(id,ir) == 1) THEN                 ! Dependence on total concentration
+!             MonodTermPerturb = sTMPperturb(i2,i)/( sTMPperturb(i2,i) + halfsataq(id,ir) )
+!           ELSE
+!             IF (i == i2) THEN 
+!               MonodTermPerturb = sppTMP10perturb(i)/(halfsataq(id,ir)+sppTMP10perturb(i))
+!             ELSE
+!               MonodTermPerturb = sp10(i,jx,jy,jz)/(halfsataq(id,ir)+sp10(i,jx,jy,jz))
+!             END IF
+!           END IF
+          
+! !        END IF         
+
+!         OtherMonodTerms = 1.0d0
+!         DO idDummy = 1,nmonodaq(ir)
+!           IF (id /= idDummy) THEN
+!             OtherMonodTerms = OtherMonodTerms*termMonod(idDummy,ir)
+!           END IF
+!         END DO
+
+!         DerivativeMonodTerm = (MonodTermPerturb - MonodTerm )/perturb 
+
+!         jac_prekin(i2,1) = jac_prekin(i2,1) + OtherMonodTerms*DerivativeMonodTerm
+
+!       END DO
+
+!      END DO
 
 !! add inhibition 2011-08-15
 !!  Inhibition terms
@@ -509,12 +554,13 @@ DO ir = 1,ikin
       snormAqueous = satkin(ir)
     ENDIF
 
-    term1 = sign*DABS(snormAqueous - 1.0D0)
+     term1 = sign*DABS(snormAqueous - 1.0D0)
 
-!!  Reaction assumed to be irreversible, so do not let it go in reverse
+! !!  Reaction assumed to be irreversible, so do not let it go in reverse
 
-    affinity = term1
-    
+!     !!affinity = term1
+     affinity = MAX(0.0d0,term1)
+
 !!    jj = p_cat_kin(ir)
     jj = ir
     check(:) = -mukinTMP(jj,:)*snormAqueous
@@ -538,7 +584,11 @@ DO ir = 1,ikin
 !   pointer to biomass for current reaction
 !!    ib = ibiomass_kin(p_cat_kin(ir))
     ib = ibiomass_kin(ir)
-    vol_temp = volfx(ib,jx,jy,jz) / (volmol(ib) * satliq(jx,jy,jz) * por(jx,jy,jz) * ro(jx,jy,jz) )
+    !!vol_temp = volfx(ib,jx,jy,jz)
+    !!vol_temp = volfx(ib,jx,jy,jz) / (volmol(ib) * satliq(jx,jy,jz) * por(jx,jy,jz) * ro(jx,jy,jz) )
+
+    !!Convert mol/m3 bulk in mol/Lw
+    vol_temp = volfx(ib,jx,jy,jz) / (por(jx,jy,jz) * ro(jx,jy,jz) * satliq(jx,jy,jz))
 
 ! note on units: dividing by por and ro below to convert units to mol/Kg-H2O/yr (see note in reactkin.F90)
     
