@@ -141,7 +141,7 @@ DO jz = 1,nz
         IF (MineralAssociate(k)) THEN
             
           kk = MineralID(k)
-          IF (spinup .AND. mintype(k) /= 1) THEN
+          IF (spinup .AND. mintype(k) /= 1 .AND. umin(k)/='C5H7O2N(s)_decay') THEN
           VolumeUpdate = 0  
           ELSEIF (mintype(k) == 1 .AND. biomassfixed) THEN
           VolumeUpdate = 0  
@@ -159,7 +159,7 @@ DO jz = 1,nz
           
         ELSE
           
-          IF (spinup .AND. mintype(k) /= 1) THEN
+          IF (spinup .AND. mintype(k) /= 1 .AND. umin(k)/='C5H7O2N(s)_decay') THEN
             VolumeUpdate = 0  
             ELSEIF (mintype(k) == 1 .AND. biomassfixed) THEN
             VolumeUpdate = 0  
@@ -236,7 +236,7 @@ DO jz = 1,nz
         IF (MineralAssociate(k)) THEN
             
           kk = MineralID(k)
-          IF (spinup .AND. mintype(k) /= 1) THEN
+          IF (spinup .AND. mintype(k) /= 1 .AND. umin(k)/='C5H7O2N(s)_decay') THEN
             VolumeUpdate = 0  
             ELSEIF (mintype(k) == 1 .AND. biomassfixed) THEN
             VolumeUpdate = 0  
@@ -250,7 +250,7 @@ DO jz = 1,nz
           
         ELSE
           
-          IF (spinup .AND. mintype(k) /= 1) THEN
+          IF (spinup .AND. mintype(k) /= 1 .AND. umin(k)/='C5H7O2N(s)_decay') THEN
             VolumeUpdate = 0  
             ELSEIF (mintype(k) == 1 .AND. biomassfixed) THEN
             VolumeUpdate = 0  
