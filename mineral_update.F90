@@ -145,6 +145,8 @@ DO jz = 1,nz
           VolumeUpdate = 0  
           ELSEIF (mintype(k) == 1 .AND. biomassfixed) THEN
           VolumeUpdate = 0  
+          ELSEIF (umin(k)=='C5H7O2N(s)_decay' .AND. biomassfixed) THEN
+            VolumeUpdate = 0  
           ELSE
           VolumeUpdate = volmol(kk)*dppt(k,jx,jy,jz)*dt   !  Point to volume fraction of associated mineral
           ENDIF
@@ -163,6 +165,8 @@ DO jz = 1,nz
             VolumeUpdate = 0  
             ELSEIF (mintype(k) == 1 .AND. biomassfixed) THEN
             VolumeUpdate = 0  
+            ELSEIF (umin(k)=='C5H7O2N(s)_decay' .AND. biomassfixed) THEN
+              VolumeUpdate = 0  
           ELSE
           VolumeUpdate = volmol(k)*dppt(k,jx,jy,jz)*dt
           ENDIF
@@ -240,6 +244,8 @@ DO jz = 1,nz
             VolumeUpdate = 0  
             ELSEIF (mintype(k) == 1 .AND. biomassfixed) THEN
             VolumeUpdate = 0  
+            ELSEIF (umin(k)=='C5H7O2N(s)_decay' .AND. biomassfixed) THEN
+              VolumeUpdate = 0  
             ELSE
           VolumeUpdate = volmol(kk)*dppt(k,jx,jy,jz)*dt   !  Point to volume fraction of associated mineral
             ENDIF
@@ -254,6 +260,8 @@ DO jz = 1,nz
             VolumeUpdate = 0  
             ELSEIF (mintype(k) == 1 .AND. biomassfixed) THEN
             VolumeUpdate = 0  
+            ELSEIF (umin(k)=='C5H7O2N(s)_decay' .AND. biomassfixed) THEN
+              VolumeUpdate = 0  
           ELSE
           VolumeUpdate = volmol(k)*dppt(k,jx,jy,jz)*dt
           ENDIF
