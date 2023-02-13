@@ -276,6 +276,34 @@ ELSE
 END IF
 CLOSE(UNIT=8,STATUS='keep')
 
+fn='act'
+ilength = 4
+CALL newfile(fn,suf1,fnv,nint,ilength)
+OPEN(UNIT=8,FILE=fnv, ACCESS='sequential',STATUS='unknown')
+WRITE(8,2283) PrintTime
+WRITE(8,120)
+120 FORMAT('# Units: Log10 act')
+
+IF (ikph /= 0) THEN
+  WRITE(8,2288) (ulabprnt(ik),ik=1,ncomp+nspec)
+  jy = 1
+  jz = 1
+  DO jx = 1,nx
+    phprt =  -(sp(ikph,jx,jy,jz)+gam(ikph,jx,jy,jz))/clg
+    WRITE(8,184) x(jx)*OutputDistanceScale, phprt,((sp(ik,jx,jy,jz)+gam(ik,jx,jy,jz))/clg,ik = 1,ncomp+nspec)
+  END DO
+ELSE
+  WRITE(8,2285) (ulabprnt(ik),ik=1,ncomp+nspec)
+  jy = 1
+  jz = 1
+  DO jx = 1,nx
+    WRITE(8,184) x(jx)*OutputDistanceScale, ((sp(ik,jx,jy,jz)+gam(ik,jx,jy,jz))/clg,ik = 1,ncomp+nspec)
+  END DO
+END IF
+CLOSE(UNIT=8,STATUS='keep')
+
+
+
 IF (nIsotopePrimary > 0) THEN
   fn='toperatio_aq'
   ilength = 12
