@@ -613,7 +613,8 @@ IF (found) THEN
   
   DO k = 1,nkin
     IF (mintype(k) == 1) THEN    ! biomass - convert to mol/m^3-bulk from mol/L-H2O    ???  Volin should be m^3/m^3 (like porosity)
-      volin(k,nchem) = volin(k,nchem)*rocond(nchem)*porcond(nchem)*SaturationCond(nchem) !! biomass entry is now mol/L bulk (lucien)
+      !!volin(k,nchem) = volin(k,nchem)*rocond(nchem)*porcond(nchem)*SaturationCond(nchem) !! biomass entry in mol/Lw (lucien)
+      volin(k,nchem) = volin(k,nchem) !! biomass entry is mol/m3 bulk (lucien)
     END IF
   END DO
 
