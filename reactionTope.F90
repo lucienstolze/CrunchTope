@@ -538,7 +538,11 @@ DO k = 1,nkin
       IF (MineralAssociate(k)) THEN
 
         IF (MineralID(k) < k) THEN     !!  NOTE: This requires that the mineral that is associated with is earlier in list
+          if (umin(k)=='TOC_soil_inert' ) then
+            surf(np,k) = 1 !!areainByGrid(MineralID(k),jx,jy,jz)*porfactor
+            else
           surf(np,k) = area(MineralID(k),jx,jy,jz)*porfactor
+            endif
         ELSE
           write(*,*) ' Associated mineral should be earlier in mineral list'
           write(*,*)
@@ -570,8 +574,11 @@ DO k = 1,nkin
 
         IF (MineralID(k) < k) THEN
 !!!          surf(np,k) = surf(np,MineralID(k))*porfactor
+          if (umin(k)=='TOC_soil_inert' ) then
+          surf(np,k) = 1 !!areainByGrid(MineralID(k),jx,jy,jz)*porfactor
+          else
           surf(np,k) = area(MineralID(k),jx,jy,jz)*porfactor
-
+          endif
         ELSE
 !!!          IF (porfactor < 0.01d0) THEN
 !!!             surf(np,k) = area(MineralID(k),jx,jy,jz)*porfactor
@@ -624,6 +631,13 @@ DO k = 1,nkin
       surf(np,k) = 1.0d0
     END IF
 
+
+      ! if (umin(k)=='TOC_soil_inert') then !! Try for long-term simulation in which OM accumulates on top 
+      !   surf(np,k) = areainByGrid(MineralID(k),jx,jy,jz)*porfactor
+      !   endif
+      ! if (umin(k)=='TOC_soil') then !! Try for long-term simulation in which OM accumulates on top 
+      !     surf(np,k) = areainByGrid(k,jx,jy,jz)*porfactor
+      !   endif
 !!!  *********************  End of calculation of surface area  **************************
     
     IF (surf(np,k) == 0.0D0) THEN
@@ -1127,7 +1141,7 @@ DO k = 1,nkin
 
     IF (east_river) then
 
-      if (umin(k)=='Kerogene' .OR. umin(k)=='TOC_soil') then
+      if (umin(k)=='Kerogene' .OR. umin(k)=='TOC_soil' .OR. umin(k)=='TOCshale' .OR. umin(k)=='TOCsoil') then
         sat_thres=thres_OM
         sat_exp = exp_OM
         if (satliq(jx,jy,jz) < sat_thres) then

@@ -928,11 +928,11 @@ endif
         ELSEIF (activecellPressure(jx,jy,jz) == 0 .AND. activecellPressure(jx,jy+1,jz) == 0) THEN
         gflux_ver(i)=0
         ELSEIF (jy == 0 .AND. activecellPressure(jx,jy+1,jz) == 1) THEN
-        gflux_ver(i)=(fg(jx,jy+1,1))*(spgas10(i,jx,jy+1,1)-spcondgas10(i,jinit(jx,jy,1)))/((dyy(jy)+dyy(jy+1))/2)
+        gflux_ver(i)=(fg(jx,jy+1,1))*(spgas10(i,jx,jy+1,1)-spcondgas10(i,jinit(jx,jy,1)))
         ELSEIF (jy<ny .AND. activecellPressure(jx,jy,jz) == 1 .AND. activecellPressure(jx,jy+1,jz) == 0) THEN
-        gflux_ver(i)=(fg(jx,jy+1,1))*(spgas10(i,jx,jy+1,1)-spcondgas10(i,jinit(jx,jy,1)))/((dyy(jy)+dyy(jy+1))/2)
+        gflux_ver(i)=(fg(jx,jy+1,1))*(spgas10(i,jx,jy+1,1)-spcondgas10(i,jinit(jx,jy,1)))
         ELSE
-        gflux_ver(i)=(fg(jx,jy+1,1))*(spgas10(i,jx,jy+1,1)-spgas10(i,jx,jy,1))/((dyy(jy)+dyy(jy+1))/2)
+        gflux_ver(i)=(fg(jx,jy+1,1))*(spgas10(i,jx,jy+1,1)-spgas10(i,jx,jy,1))
         END IF
         if (gflux_ver(i)<1.0E-30 .and. gflux_ver(i)>-1.0E-30) THEN
           gflux_ver(i)=1.0E-30

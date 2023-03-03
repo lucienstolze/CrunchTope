@@ -62,6 +62,11 @@ REAL(DP), PARAMETER                                                   :: visc=0.
 REAL(DP), PARAMETER                                                   :: Ss=1.0D-05
 REAL(DP), PARAMETER                                                   :: grav=9.8d0
 REAL(DP), PARAMETER                                                   :: rho=1.0d3
+REAL(DP), PARAMETER                                                   :: x1=2.1850
+REAL(DP), PARAMETER                                                   :: x2=0.04012
+REAL(DP), PARAMETER                                                   :: x3=5.1547d-6
+REAL(DP)                                                              :: t_F
+REAL(DP)                                                              :: visc_t
 
 
 DO jz = 0,nz+1
@@ -149,12 +154,21 @@ DO jz = 1,nz
             ELSE
                 IF (upstream_weighting) THEN
                     IF (qx(jx,jy,jz) >= 0.0) THEN
-                        Kfacx(jx,jy,jz) = permx(jx,jy,jz)*Kr(jx,jy,jz) * (ro(jx,jy,jz)*grav/visc)
+                        ! t_F = t(jx,jy,jz)*(9.0/5.0) + 32.0
+                        ! visc_t = visc * x1 / (-1.0  + x2 * t_F + x3 * t_F**2.0 )
+                        visc_t = 2.414e-5 * 10**(247.8/(273.15 + t(jx,jy,jz) - 140))
+                        Kfacx(jx,jy,jz) = permx(jx,jy,jz)*Kr(jx,jy,jz) * (ro(jx,jy,jz)*grav/visc_t)
                     ELSE
-                        Kfacx(jx,jy,jz) = permx(jx+1,jy,jz)*Kr(jx+1,jy,jz) * (ro(jx+1,jy,jz)*grav/visc)
+                        ! t_F = t(jx,jy,jz)*(9.0/5.0) + 32.0
+                        ! visc_t = visc * x1 / (-1.0  + x2 * t_F + x3 * t_F**2.0 )
+                        visc_t = 2.414e-5 * 10**(247.8/(273.15 + t(jx,jy,jz) - 140))
+                        Kfacx(jx,jy,jz) = permx(jx+1,jy,jz)*Kr(jx+1,jy,jz) * (ro(jx+1,jy,jz)*grav/visc_t)
                     END IF
                 ELSE
-                    Kfacx(jx,jy,jz) = 0.5 * (permx(jx,jy,jz)*Kr(jx,jy,jz) + permx(jx+1,jy,jz)*Kr(jx+1,jy,jz)) * (ro(jx,jy,jz)*grav/visc)
+                    ! t_F = t(jx,jy,jz)*(9.0/5.0) + 32.0
+                        ! visc_t = visc * x1 / (-1.0  + x2 * t_F + x3 * t_F**2.0 )
+                    visc_t = 2.414e-5 * 10**(247.8/(273.15 + t(jx,jy,jz) - 140))
+                    Kfacx(jx,jy,jz) = 0.5 * (permx(jx,jy,jz)*Kr(jx,jy,jz) + permx(jx+1,jy,jz)*Kr(jx+1,jy,jz)) * (ro(jx,jy,jz)*grav/visc_t)
                 END IF
                 ! zero conductivity if either cell is impermeable
                 IF (permx(jx,jy,jz) == 0.0d0 .OR. permx(jx+1,jy,jz) == 0.0d0) THEN
@@ -180,12 +194,21 @@ DO jz = 1,nz
             ELSE
                 IF (upstream_weighting) THEN
                     IF (qy(jx,jy,jz) >= 0.0) THEN
-                        Kfacy(jx,jy,jz) = permy(jx,jy,jz)*Kr(jx,jy,jz) * (ro(jx,jy,jz)*grav/visc)
+                        ! t_F = t(jx,jy,jz)*(9.0/5.0) + 32.0
+                        ! visc_t = visc * x1 / (-1.0  + x2 * t_F + x3 * t_F**2.0 )
+                        visc_t = 2.414e-5 * 10**(247.8/(273.15 + t(jx,jy,jz) - 140))
+                        Kfacy(jx,jy,jz) = permy(jx,jy,jz)*Kr(jx,jy,jz) * (ro(jx,jy,jz)*grav/visc_t)
                     ELSE
-                        Kfacy(jx,jy,jz) = permy(jx,jy+1,jz)*Kr(jx,jy+1,jz) * (ro(jx,jy+1,jz)*grav/visc)
+                        ! t_F = t(jx,jy,jz)*(9.0/5.0) + 32.0
+                        ! visc_t = visc * x1 / (-1.0  + x2 * t_F + x3 * t_F**2.0 )
+                        visc_t = 2.414e-5 * 10**(247.8/(273.15 + t(jx,jy,jz) - 140))
+                        Kfacy(jx,jy,jz) = permy(jx,jy+1,jz)*Kr(jx,jy+1,jz) * (ro(jx,jy+1,jz)*grav/visc_t)
                     END IF
                 ELSE
-                    Kfacy(jx,jy,jz) = 0.5 * (permy(jx,jy,jz)*Kr(jx,jy,jz) + permy(jx,jy+1,jz)*Kr(jx,jy+1,jz)) * (ro(jx,jy,jz)*grav/visc)
+                    ! t_F = t(jx,jy,jz)*(9.0/5.0) + 32.0
+                        ! visc_t = visc * x1 / (-1.0  + x2 * t_F + x3 * t_F**2.0 )
+                    visc_t = 2.414e-5 * 10**(247.8/(273.15 + t(jx,jy,jz) - 140))
+                    Kfacy(jx,jy,jz) = 0.5 * (permy(jx,jy,jz)*Kr(jx,jy,jz) + permy(jx,jy+1,jz)*Kr(jx,jy+1,jz)) * (ro(jx,jy,jz)*grav/visc_t)
                 END IF
                 IF (permy(jx,jy,jz) == 0.0d0 .OR. permy(jx,jy+1,jz) == 0.0d0) THEN
                     Kfacy(jx,jy,jz) = 0.0d0
@@ -197,9 +220,15 @@ DO jz = 1,nz
                     IF (activecellPressure(jx,jy+1,jz) == 1) THEN
                         ! saturated if pressure is prescribed
                         IF (headOld(jx,jy,jz) > 0.0) THEN
-                            Kfacy(jx,jy,jz) = permy(jx,jy,jz) * (ro(jx,jy,jz)*grav/visc) !! TO BE CHECKED LUCIEN
+                            ! t_F = t(jx,jy,jz)*(9.0/5.0) + 32.0
+                        ! visc_t = visc * x1 / (-1.0  + x2 * t_F + x3 * t_F**2.0 )
+                        visc_t = 2.414e-5 * 10**(247.8/(273.15 + t(jx,jy,jz) - 140))
+                            Kfacy(jx,jy,jz) = permy(jx,jy,jz) * (ro(jx,jy,jz)*grav/visc_t) !! TO BE CHECKED LUCIEN
                         ELSE
-                            Kfacy(jx,jy,jz) = permy(jx,jy+1,jz)*Kr(jx,jy+1,jz) * (ro(jx,jy+1,jz)*grav/visc)
+                            ! t_F = t(jx,jy,jz)*(9.0/5.0) + 32.0
+                        ! visc_t = visc * x1 / (-1.0  + x2 * t_F + x3 * t_F**2.0 )
+                        visc_t = 2.414e-5 * 10**(247.8/(273.15 + t(jx,jy,jz) - 140))
+                            Kfacy(jx,jy,jz) = permy(jx,jy+1,jz)*Kr(jx,jy+1,jz) * (ro(jx,jy+1,jz)*grav/visc_t)
                         END IF
                         !Kfacy(jx,jy,jz) = 0.0d0
                     ELSE
@@ -216,16 +245,25 @@ DO jz = 0,nz
             IF (nz == 1) THEN
                 Kfacz(jx,jy,jz) = 0.0d0
             ELSE
-                Kfacz(jx,jy,jz) = 0.5 * (permz(jx,jy,jz)*Kr(jx,jy,jz) + permz(jx,jy,jz+1)*Kr(jx,jy,jz+1)) * (ro(jx,jy,jz)*grav/visc)
+                ! t_F = t(jx,jy,jz)*(9.0/5.0) + 32.0
+                        ! visc_t = visc * x1 / (-1.0  + x2 * t_F + x3 * t_F**2.0 )
+                visc_t = 2.414e-5 * 10**(247.8/(273.15 + t(jx,jy,jz) - 140))
+                Kfacz(jx,jy,jz) = 0.5 * (permz(jx,jy,jz)*Kr(jx,jy,jz) + permz(jx,jy,jz+1)*Kr(jx,jy,jz+1)) * (ro(jx,jy,jz)*grav/visc_t)
                 IF (permz(jx,jy,jz) == 0.0d0 .OR. permz(jx,jy,jz+1) == 0.0d0) THEN
                     Kfacz(jx,jy,jz) = 0.0d0
                 END IF
                 IF (jz == 0 .AND. pres(jx,jy,jz) > 0) THEN
-                    Kfacz(jx,jy,jz) = permz(jx,jy,jz) * (ro(jx,jy,jz)*grav/visc)
+                    ! t_F = t(jx,jy,jz)*(9.0/5.0) + 32.0
+                        ! visc_t = visc * x1 / (-1.0  + x2 * t_F + x3 * t_F**2.0 )
+                    visc_t = 2.414e-5 * 10**(247.8/(273.15 + t(jx,jy,jz) - 140))
+                    Kfacz(jx,jy,jz) = permz(jx,jy,jz) * (ro(jx,jy,jz)*grav/visc_t)
                 END IF
                 IF (activecellPressure(jx,jy,jz) == 0) THEN
                     IF (activecellPressure(jx,jy,jz+1) == 1) THEN
-                        Kfacz(jx,jy,jz) = 0.5 * (permz(jx,jy,jz)*Kr(jx,jy,jz) + permz(jx,jy,jz+1)*Kr(jx,jy,jz+1)) * (ro(jx,jy,jz)*grav/visc)
+                        ! t_F = t(jx,jy,jz)*(9.0/5.0) + 32.0
+                        ! visc_t = visc * x1 / (-1.0  + x2 * t_F + x3 * t_F**2.0 )
+                        visc_t = 2.414e-5 * 10**(247.8/(273.15 + t(jx,jy,jz) - 140))
+                        Kfacz(jx,jy,jz) = 0.5 * (permz(jx,jy,jz)*Kr(jx,jy,jz) + permz(jx,jy,jz+1)*Kr(jx,jy,jz+1)) * (ro(jx,jy,jz)*grav/visc_t)
                     ELSE
                         Kfacz(jx,jy,jz) = 0.0d0
                     END IF

@@ -208,6 +208,7 @@ REAL(DP), DIMENSION(ncomp)                                 :: IsotopeRatio
 INTEGER(I4B)                                       :: ls
 
 REAL(DP), DIMENSION(ncomp)                         :: gflux_hor
+REAL(DP), DIMENSION(ncomp)          :: dummy
 
 pi = DACOS(-1.0d0)
 
@@ -385,7 +386,13 @@ WRITE(8,2285) (ulabprnt(ik),ik=1,ncomp)
 jy = 1
 jz = 1
 DO jx = 1,nx
-  WRITE(8,184) x(jx)*OutputDistanceScale,(s(i,jx,jy,jz),i = 1,ncomp)
+  DO j = 1,ncomp
+  dummy(j)=s(j,jx,jy,jz)
+  IF (abs(dummy(j))<1e-40) THEN
+    dummy(j)=1e-40
+  endif
+  enddo
+  WRITE(8,184) x(jx)*OutputDistanceScale,(dummy(i),i = 1,ncomp)
 END DO
 CLOSE(UNIT=8,STATUS='keep')
 
